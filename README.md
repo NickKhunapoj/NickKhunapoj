@@ -5,7 +5,7 @@
 
 <p align="center"> <a href="https://github.com/ryo-ma/github-profile-trophy"><img src="https://github-profile-trophy.vercel.app/?username=nickkhunapoj" alt="nickkhunapoj" /></a> </p>
 
-- 🔭 I’m currently working on **my uni project.**
+- 🔭 I’m currently working on **how to centre my life**
 
 - 🌱 I’m currently learning **tech...**
 
