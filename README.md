@@ -5,11 +5,13 @@
 
 <p align="center"> <a href="https://github.com/ryo-ma/github-profile-trophy"><img src="https://github-profile-trophy.vercel.app/?username=nickkhunapoj" alt="nickkhunapoj" /></a> </p>
 
-- 🔭 I’m currently working on **how to centre my life**
+- 🔭 I’m currently working on **Operation and Automation work**
 
-- 🌱 I’m currently learning **tech...**
+- 🌱 I’m currently learning **DevOps**
 
-- 📫 How to reach me **Khuanpoj@suttenon.com**
+- 📫 How to reach me
+  Personal: **Nickkipad@gmail.com**
+  Work: **s6501012630034@kmutnb.ac.th**
 
 <h3 align="center">Connect with me:</h3>
 <p align="center">
