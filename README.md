@@ -6,7 +6,7 @@
 
 <p align="center"> <a href="https://github.com/ryo-ma/github-profile-trophy"><img src="https://github-profile-trophy.vercel.app/?username=nickkhunapoj" alt="nickkhunapoj" /></a> </p>
 
-- 🔭 I’m currently working on **Operation and Automation work**
+- 🔭 I’m currently working on **Software Development Practice 2 project.**
 
 - 🌱 I’m currently learning **DevOps and stuff.**
 
