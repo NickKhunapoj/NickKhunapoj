@@ -6,9 +6,9 @@
 
 <p align="center"> <a href="https://github.com/ryo-ma/github-profile-trophy"><img src="https://github-profile-trophy.vercel.app/?username=nickkhunapoj" alt="nickkhunapoj" /></a> </p>
 
-- 🔭 I’m currently working on **Software Development Practice 2 project.**
+- 🔭 I’m currently working on **A large pile of work 👀**
 
-- 🌱 I’m currently learning **DevOps and stuff.**
+- 🌱 I’m currently learning **some maths stuff 🙉.**
 
 - ⚡ Fun fact, **well... there's none. 🥲**
 
