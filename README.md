@@ -6,7 +6,7 @@
 
 <p align="center"> <a href="https://github.com/ryo-ma/github-profile-trophy"><img src="https://github-profile-trophy.vercel.app/?username=nickkhunapoj" alt="nickkhunapoj" /></a> </p>
 
-- 🔭 I’m currently working on **A large pile of work 👀**
+- 🔭 I’m currently working on **something interesting 👀**
 
 - 🌱 I’m currently learning **some maths stuff 🙉.**
 
@@ -14,11 +14,10 @@
 
 <h3 align="center">Connect with me:</h3>
 <p align="center">
-<a href="https://linkedin.com/in/khunapoj suttenon" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="khunapoj suttenon" height="30" width="40" /></a>
-<a href="https://fb.com/khunapoj suttenon" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/facebook.svg" alt="khunapoj suttenon" height="30" width="40" /></a>
+<a href="https://www.linkedin.com/in/khunapoj-suttenon-76406b1a0/" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="khunapoj suttenon" height="30" width="40" /></a>
+<a href="https://www.facebook.com/khuanpoj.suttenon/" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/facebook.svg" alt="khunapoj suttenon" height="30" width="40" /></a>
 <a href="https://instagram.com/nick_gogogo" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/instagram.svg" alt="nick_gogogo" height="30" width="40" /></a>
 <a href="https://www.youtube.com/c/nick gogogo" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/youtube.svg" alt="nick gogogo" height="30" width="40" /></a>
-<a href="/https://feeds.redcircle.com/16c1bebd-7c70-4363-b232-f7d132602db3" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/rss.svg" alt="https://feeds.redcircle.com/16c1bebd-7c70-4363-b232-f7d132602db3" height="30" width="40" /></a>
 </p>
 
 <h3 align="center">Languages and Tools:</h3>
