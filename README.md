@@ -10,7 +10,7 @@
 
 - 🌱 I’m currently learning **some maths stuff 🙉.**
 
-- ⚡ Fun fact, **well... there's none. 🥲**
+- 📬 Contact me at **Nickkipad@gmail.com**
 
 <h3 align="center">Connect with me:</h3>
 <p align="center">
