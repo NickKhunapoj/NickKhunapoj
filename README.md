@@ -10,7 +10,7 @@
 
 - 🌱 I’m currently learning **some maths stuff 🙉.**
 
-- 📬 Contact me at **Nickkipad@gmail.com**
+- 📬 Contact me (official mail) at **Khunapoj.s@gmail.com**
 
 <h3 align="center">Connect with me:</h3>
 <p align="center">
