@@ -1,6 +1,6 @@
 <h1 align="center">Hi 👋, I'm Khunapoj Suttenon</h1>
 <h3 align="center">Study Computer Engineering at KMUTNB, Bangkok, Thailand.</h3>
-<h3 align="center">Nice to meet you guys. 🫠</h3>
+<h3 align="center">Nice to meet you guys.</h3>
 
 <p align="center"> <img src="https://komarev.com/ghpvc/?username=nickkhunapoj&label=Profile%20views&color=0e75b6&style=flat" alt="nickkhunapoj" /> </p>
 
@@ -12,9 +12,9 @@
     <img src="https://github-readme-stats.vercel.app/api?username=nickkhunapoj&show_icons=true&theme=dark&bg_color=000000&locale=en" alt="nickkhunapoj" height=165px>
 </div>
 
-- 🔭 I’m currently working on **something interesting 👀**
+- 🔭 I’m currently working on **uni projects and works 👀**
 
-- 🌱 I’m currently learning **some maths stuff 🙉.**
+- 🌱 I’m currently learning **a lot of maths 🙉.**
 
 - 📬 Contact me (official mail) at **Khunapoj.s@gmail.com**
 
