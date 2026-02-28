@@ -4,17 +4,9 @@
 
 <p align="center"> <img src="https://komarev.com/ghpvc/?username=nickkhunapoj&label=Profile%20views&color=0e75b6&style=flat" alt="nickkhunapoj" /> </p>
 
-<div align="center">
-  <a href="https://github.com/ryo-ma/github-profile-trophy">
-      <img src="https://github-profile-trophy.vercel.app/?username=nickkhunapoj&theme=onedark" alt="nickkhunapoj" />
-  </a>
-    <img src="https://github-readme-stats.vercel.app/api/top-langs?username=nickkhunapoj&show_icons=true&theme=dark&locale=en&layout=compact" alt="nickkhunapoj">
-    <img src="https://github-readme-stats.vercel.app/api?username=nickkhunapoj&show_icons=true&theme=dark&bg_color=000000&locale=en" alt="nickkhunapoj" height=165px>
-</div>
+- 🔭 I’m currently working on **my university project👀**
 
-- 🔭 I’m currently working on **uni projects and works 👀**
-
-- 🌱 I’m currently learning **a lot of maths 🙉.**
+- 🌱 I’m currently learning **technical and social work skills 🙉.**
 
 - 📬 Contact me (official mail) at **Khunapoj.s@gmail.com**
 
