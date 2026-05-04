@@ -1,0 +1,48 @@
+.skeletonCard {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+}
+
+.skeletonLine {
+  height: 14px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 25%,
+    var(--color-surface-hover) 50%,
+    var(--color-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonTitle {
+  composes: skeletonLine;
+  width: 60%;
+  height: 18px;
+  margin-bottom: var(--space-sm);
+}
+
+.skeletonSub {
+  composes: skeletonLine;
+  width: 40%;
+  margin-bottom: var(--space-md);
+}
+
+.skeletonBody {
+  composes: skeletonLine;
+  width: 90%;
+  margin-bottom: var(--space-xs);
+}
+
+.skeletonBody2 {
+  composes: skeletonLine;
+  width: 70%;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

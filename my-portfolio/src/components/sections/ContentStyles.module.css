@@ -1,0 +1,155 @@
+.grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.grid2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.highlights {
+  margin-top: var(--space-sm);
+  padding-left: var(--space-md);
+}
+
+.highlights li {
+  position: relative;
+  padding-left: var(--space-md);
+  margin-bottom: var(--space-xs);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.highlights li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--color-accent);
+}
+
+.linkRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.iconLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-xs);
+  color: var(--color-accent);
+  transition: opacity var(--transition-fast);
+}
+
+.iconLink:hover {
+  opacity: 0.7;
+}
+
+/* Skill grouping */
+.skillGroup {
+  margin-bottom: var(--space-xl);
+}
+
+.skillGroupTitle {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-md);
+}
+
+.skillTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.skillTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.skillTag:hover {
+  border-color: var(--color-border-hover);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+}
+
+.skillIcon {
+  font-size: var(--text-base);
+}
+
+.skillLevel {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-left: 4px;
+}
+
+/* Score display */
+.scoreDisplay {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: var(--space-sm);
+}
+
+.scoreValue {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.scoreMax {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+}
+
+.scoreBar {
+  width: 100%;
+  height: 4px;
+  background: var(--color-surface);
+  border-radius: var(--radius-full);
+  margin-top: var(--space-sm);
+  overflow: hidden;
+}
+
+.scoreBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-accent), #64c8ff);
+  border-radius: var(--radius-full);
+  transition: width 1s ease-out;
+}
+
+@media (max-width: 1024px) {
+  .grid3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .grid2,
+  .grid3 {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,27 @@
+.section {
+  padding: var(--space-4xl) 0;
+}
+
+.header {
+  margin-bottom: var(--space-2xl);
+}
+
+.title {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.subtitle {
+  font-size: var(--text-lg);
+  color: var(--color-text-secondary);
+  font-weight: 400;
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: var(--space-3xl) 0;
+  }
+}
