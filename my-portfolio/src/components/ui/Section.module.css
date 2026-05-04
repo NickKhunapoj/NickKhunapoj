@@ -2,6 +2,12 @@
   padding: var(--space-4xl) 0;
 }
 
+/* When a section is inside the edu-exp side-by-side grid, reduce spacing */
+:global(.edu-exp-grid) .section {
+  padding: var(--space-xl) 0 var(--space-lg);
+}
+
+
 .header {
   margin-bottom: var(--space-2xl);
 }

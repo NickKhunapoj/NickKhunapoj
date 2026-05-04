@@ -18,17 +18,33 @@ export default function AwardSection({ data }: Props) {
           <EmptyState icon="🏆" message="No awards listed yet." />
         ) : (
           <div className={`${styles.grid} ${styles.grid2}`}>
-            {data.map((item) => (
-              <Card
-                key={item.id}
-                title={item.title}
-                subtitle={item.issuer || undefined}
-                meta={formatDate(item.award_date)}
-                href={item.url || undefined}
-              >
-                {item.description && <p>{item.description}</p>}
-              </Card>
-            ))}
+            {data.map((item) => {
+              const gallery = Array.isArray(item.gallery_images) ? item.gallery_images : [];
+              return (
+                <Card
+                  key={item.id}
+                  title={item.title}
+                  subtitle={item.issuer || undefined}
+                  meta={formatDate(item.award_date)}
+                  href={item.url || undefined}
+                >
+                  {item.description && <p>{item.description}</p>}
+                  {gallery.length > 0 && (
+                    <div className={styles.galleryGrid}>
+                      {gallery.map((url, i) => (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          key={i}
+                          src={url}
+                          alt={`${item.title} photo ${i + 1}`}
+                          className={styles.galleryImg}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </Card>
+              );
+            })}
           </div>
         )}
       </Section>

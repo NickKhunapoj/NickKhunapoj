@@ -62,7 +62,8 @@ export default function AdminDashboard() {
     currentCategory.fields.forEach((f) => {
       if (f.type === 'toggle') defaults[f.name] = true;
       else if (f.type === 'number') defaults[f.name] = 0;
-      else if (f.type === 'json-array') defaults[f.name] = '';
+      else if (f.type === 'json-array') defaults[f.name] = ''; // must stay string for .split()
+      else if (f.type === 'gallery') defaults[f.name] = [];    // stays as string[]
       else defaults[f.name] = '';
     });
     setFormData(defaults);
@@ -76,6 +77,9 @@ export default function AdminDashboard() {
       if (f.type === 'json-array') {
         const arr = Array.isArray(item[f.name]) ? (item[f.name] as string[]) : [];
         data[f.name] = arr.join('\n');
+      } else if (f.type === 'gallery') {
+        // gallery stays as string[]
+        data[f.name] = Array.isArray(item[f.name]) ? item[f.name] : [];
       } else {
         data[f.name] = item[f.name] ?? '';
       }
@@ -96,6 +100,9 @@ export default function AdminDashboard() {
           .split('\n')
           .map((s) => s.trim())
           .filter(Boolean);
+      } else if (f.type === 'gallery') {
+        // gallery is already string[]
+        payload[f.name] = Array.isArray(formData[f.name]) ? formData[f.name] : [];
       } else if (f.type === 'number') {
         payload[f.name] = Number(formData[f.name]) || 0;
       } else if (f.type === 'toggle') {
@@ -155,7 +162,7 @@ export default function AdminDashboard() {
 
   // Only show first few fields in table
   const displayFields = currentCategory.fields.filter(
-    (f) => f.type !== 'toggle' && f.type !== 'json-array' && f.type !== 'textarea'
+    (f) => f.type !== 'toggle' && f.type !== 'json-array' && f.type !== 'textarea' && f.type !== 'gallery' && f.type !== 'image' && f.type !== 'file'
   ).slice(0, 3);
 
   // Allow only 1 profile
@@ -379,20 +386,54 @@ function FormField({
   onChange: (val: unknown) => void;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, acceptType: string) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
-    
+
+    // Validate for PDF
+    if (acceptType === 'application/pdf' && file.type !== 'application/pdf') {
+      alert('Please upload a PDF file only.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File is too large. Maximum size is 10 MB.');
+      return;
+    }
+
     setUploading(true);
-    const { uploadImage } = await import('@/lib/supabase/storage');
-    const url = await uploadImage(file);
+    const { uploadFile } = await import('@/lib/supabase/storage');
+    const url = await uploadFile(file);
     if (url) {
       onChange(url);
     } else {
-      alert('Failed to upload image.');
+      alert('Failed to upload file.');
     }
     setUploading(false);
+    e.target.value = '';
+  };
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const files = Array.from(e.target.files);
+    if (files.some(f => f.size > 10 * 1024 * 1024)) {
+      alert('One or more files exceed the 10 MB limit.');
+      return;
+    }
+
+    setUploadingGallery(true);
+    const { uploadFile } = await import('@/lib/supabase/storage');
+    const current = Array.isArray(value) ? (value as string[]) : [];
+    const uploaded: string[] = [];
+
+    for (const file of files) {
+      const url = await uploadFile(file);
+      if (url) uploaded.push(url);
+    }
+    onChange([...current, ...uploaded]);
+    setUploadingGallery(false);
+    e.target.value = '';
   };
 
   if (field.type === 'toggle') {
@@ -453,23 +494,110 @@ function FormField({
             </Button>
             <input
               type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={(e) => handleFileUpload(e, 'image/*')}
               disabled={uploading}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                opacity: 0,
-                cursor: 'pointer'
-              }}
+              style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
             />
           </div>
+          {imageUrl && (
+            <button type="button" onClick={() => onChange('')} style={{ color: 'var(--color-danger)', fontSize: 'var(--text-xs)', flexShrink: 0 }}>
+              ✕ Remove
+            </button>
+          )}
         </div>
         {imageUrl && (
           <div style={{ marginTop: '8px', borderRadius: '8px', overflow: 'hidden', width: '80px', height: '80px', border: '1px solid var(--color-border)' }}>
             <img src={imageUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         )}
+      </div>
+    );
+  }
+
+  if (field.type === 'file') {
+    const fileUrl = typeof value === 'string' ? value : '';
+    const isPdf = field.accept === 'application/pdf';
+    return (
+      <div className={styles.formField}>
+        <label className={styles.formLabel}>{field.label}</label>
+        {fileUrl && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, padding: '8px 12px', background: 'var(--glass-bg)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', flex: 1 }}>
+              {isPdf ? '📄 Resume uploaded' : '📎 File uploaded'}
+            </span>
+            <a href={fileUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 'var(--text-xs)', color: 'var(--color-accent)' }}>
+              View ↗
+            </a>
+            <button type="button" onClick={() => onChange('')} style={{ fontSize: 'var(--text-xs)', color: 'var(--color-danger)', marginLeft: 4 }}>
+              ✕ Remove
+            </button>
+          </div>
+        )}
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          <Button type="button" variant="secondary" size="sm" disabled={uploading}>
+            {uploading ? 'Uploading...' : fileUrl ? 'Replace File' : 'Upload PDF'}
+          </Button>
+          <input
+            type="file"
+            accept={field.accept || '*/*'}
+            onChange={(e) => handleFileUpload(e, field.accept || '*/*')}
+            disabled={uploading}
+            style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
+          />
+        </div>
+        {isPdf && (
+          <span style={{ display: 'block', marginTop: 4, fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
+            PDF only · Max 10 MB
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  if (field.type === 'gallery') {
+    const images = Array.isArray(value) ? (value as string[]) : [];
+    return (
+      <div className={styles.formField}>
+        <label className={styles.formLabel}>{field.label}</label>
+        {images.length > 0 && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+            {images.map((url, i) => (
+              <div key={i} style={{ position: 'relative', width: 80, height: 80, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--color-border)' }}>
+                <img src={url} alt={`Gallery ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <button
+                  type="button"
+                  onClick={() => onChange(images.filter((_, idx) => idx !== i))}
+                  style={{
+                    position: 'absolute', top: 2, right: 2, width: 20, height: 20,
+                    borderRadius: '50%', background: 'rgba(0,0,0,0.7)', color: '#fff',
+                    fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    lineHeight: 1,
+                  }}
+                  aria-label="Remove image"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          <Button type="button" variant="secondary" size="sm" disabled={uploadingGallery}>
+            {uploadingGallery ? 'Uploading...' : '+ Add Images'}
+          </Button>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            onChange={handleGalleryUpload}
+            disabled={uploadingGallery}
+            style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
+          />
+        </div>
+        <span style={{ display: 'block', marginTop: 4, fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
+          JPG, PNG, WebP · Max 10 MB each · Multiple allowed
+        </span>
       </div>
     );
   }
@@ -493,3 +621,4 @@ function FormField({
     </div>
   );
 }
+

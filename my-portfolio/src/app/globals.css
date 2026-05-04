@@ -379,6 +379,12 @@ ul, ol {
   .container {
     padding: 0 var(--space-md);
   }
+
+  .edu-exp-grid {
+    grid-template-columns: 1fr !important;
+    padding-left: var(--space-md) !important;
+    padding-right: var(--space-md) !important;
+  }
 }
 
 @media (max-width: 480px) {

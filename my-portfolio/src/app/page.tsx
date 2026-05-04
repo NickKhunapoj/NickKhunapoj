@@ -78,11 +78,26 @@ export default async function Home() {
       <Navbar />
       <Hero profile={profile} />
       <main>
-        {/* GROUP 1: About */}
+        {/* GROUP 1: About — Profile + Dashboard + Edu/Exp side‑by‑side */}
         <div id="about" style={{ paddingTop: 'var(--nav-height)' }}>
           <ProfileSection profile={profile} />
-          <EducationSection data={education} />
-          <ExperienceSection data={experiences} />
+
+          {/* Education & Experience in a two‑column row */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: 'var(--space-md)',
+              maxWidth: 'var(--max-width)',
+              margin: '0 auto',
+              padding: '0 var(--space-lg)',
+            }}
+            className="edu-exp-grid"
+          >
+            <EducationSection data={education} />
+            <ExperienceSection data={experiences} />
+          </div>
+
           <ProjectSection data={projects} />
           <SkillSection data={skills} />
           <CourseSection data={courses} />
