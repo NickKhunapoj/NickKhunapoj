@@ -1,0 +1,20 @@
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3xl) var(--space-lg);
+  text-align: center;
+}
+
+.icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-md);
+  opacity: 0.4;
+}
+
+.message {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  max-width: 300px;
+}
