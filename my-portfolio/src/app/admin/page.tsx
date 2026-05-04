@@ -435,6 +435,7 @@ function FormField({
   }
 
   if (field.type === 'image') {
+    const imageUrl = typeof value === 'string' ? value : '';
     return (
       <div className={styles.formField}>
         <label className={styles.formLabel}>{field.label}</label>
@@ -442,7 +443,7 @@ function FormField({
           <input
             type="text"
             className={styles.formInput}
-            value={String(value ?? '')}
+            value={imageUrl}
             onChange={(e) => onChange(e.target.value)}
             placeholder="Or enter URL directly..."
           />
@@ -464,9 +465,9 @@ function FormField({
             />
           </div>
         </div>
-        {value && (
+        {imageUrl && (
           <div style={{ marginTop: '8px', borderRadius: '8px', overflow: 'hidden', width: '80px', height: '80px', border: '1px solid var(--color-border)' }}>
-            <img src={String(value)} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={imageUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         )}
       </div>
