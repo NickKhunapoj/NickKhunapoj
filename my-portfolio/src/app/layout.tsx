@@ -41,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${manrope.variable} ${kanit.variable}`}>
+    <html lang="en" data-scroll-behavior="smooth" className={`${manrope.variable} ${kanit.variable}`}>
       <body>
         <MotionProvider>{children}</MotionProvider>
       </body>

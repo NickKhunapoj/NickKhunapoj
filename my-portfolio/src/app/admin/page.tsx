@@ -294,23 +294,23 @@ export default function AdminDashboard() {
               </div>
             ) : (
               <div className={styles.tableWrapper}>
-                <table className={styles.table}>
-                  <thead>
-                    <tr>
-                      {activeCategory !== 'profiles' && <th>☰</th>}
-                      {displayFields.map((f) => (
-                        <th key={f.name}>{f.label}</th>
-                      ))}
-                      <th>Status</th>
-                      <th>Updated</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                  >
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <table className={styles.table}>
+                    <thead>
+                      <tr>
+                        {activeCategory !== 'profiles' && <th>☰</th>}
+                        {displayFields.map((f) => (
+                          <th key={f.name}>{f.label}</th>
+                        ))}
+                        <th>Status</th>
+                        <th>Updated</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
                     <SortableContext
                       items={items.map((i) => i.id as string)}
                       strategy={verticalListSortingStrategy}
@@ -329,8 +329,8 @@ export default function AdminDashboard() {
                         ))}
                       </tbody>
                     </SortableContext>
-                  </DndContext>
-                </table>
+                  </table>
+                </DndContext>
               </div>
             )}
           </motion.div>
@@ -603,39 +603,54 @@ function FormField({
   if (field.type === 'file') {
     const fileUrl = typeof value === 'string' ? value : '';
     const isPdf = field.accept === 'application/pdf';
+    const isResume = field.name === 'resume_url';
     return (
       <div className={styles.formField}>
         <label className={styles.formLabel}>{field.label}</label>
-        {fileUrl && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, padding: '8px 12px', background: 'var(--glass-bg)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
-            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', flex: 1 }}>
-              {isPdf ? '📄 Resume uploaded' : '📎 File uploaded'}
-            </span>
-            <a href={fileUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 'var(--text-xs)', color: 'var(--color-accent)' }}>
-              View ↗
-            </a>
-            <button type="button" onClick={() => onChange('')} style={{ fontSize: 'var(--text-xs)', color: 'var(--color-danger)', marginLeft: 4 }}>
-              ✕ Remove
-            </button>
+        <div className={isResume ? styles.resumeUploadPanel : styles.fileUploadPanel}>
+          <div className={styles.fileUploadHeader}>
+            <span className={styles.fileUploadIcon}>{isPdf ? '📄' : '📎'}</span>
+            <div className={styles.fileUploadText}>
+              <span className={styles.fileUploadTitle}>
+                {fileUrl ? 'Resume is ready' : isResume ? 'Upload your resume' : 'Upload file'}
+              </span>
+              <span className={styles.fileUploadHint}>
+                {isPdf ? 'PDF only, up to 10 MB. This powers the About Me resume button.' : 'Max 10 MB.'}
+              </span>
+            </div>
           </div>
-        )}
-        <div style={{ position: 'relative', display: 'inline-block' }}>
-          <Button type="button" variant="secondary" size="sm" disabled={uploading}>
-            {uploading ? 'Uploading...' : fileUrl ? 'Replace File' : 'Upload PDF'}
-          </Button>
-          <input
-            type="file"
-            accept={field.accept || '*/*'}
-            onChange={(e) => handleFileUpload(e, field.accept || '*/*')}
-            disabled={uploading}
-            style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
-          />
+
+          {fileUrl && (
+            <div className={styles.fileCurrent}>
+              <span className={styles.fileCurrentName}>
+                {isPdf ? 'Current resume PDF' : 'Current file'}
+            </span>
+              <div className={styles.fileActions}>
+                <a href={fileUrl} target="_blank" rel="noopener noreferrer" className={styles.fileActionLink}>
+                  View ↗
+                </a>
+                <button type="button" onClick={() => onChange('')} className={styles.fileRemoveBtn}>
+                  Remove
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className={styles.fileUploadActions}>
+            <div className={styles.fileInputWrap}>
+              <Button type="button" variant="secondary" size="sm" disabled={uploading}>
+                {uploading ? 'Uploading...' : fileUrl ? 'Replace PDF' : 'Choose PDF'}
+              </Button>
+              <input
+                type="file"
+                accept={field.accept || '*/*'}
+                onChange={(e) => handleFileUpload(e, field.accept || '*/*')}
+                disabled={uploading}
+                className={styles.hiddenFileInput}
+              />
+            </div>
+          </div>
         </div>
-        {isPdf && (
-          <span style={{ display: 'block', marginTop: 4, fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
-            PDF only · Max 10 MB
-          </span>
-        )}
       </div>
     );
   }
