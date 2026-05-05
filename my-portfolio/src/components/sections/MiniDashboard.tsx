@@ -19,11 +19,9 @@ const GitHubIcon = () => (
   </svg>
 );
 
-const SparklesIcon = () => (
-  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z" />
-    <path d="M5 3l.75 2.25L8 6l-2.25.75L5 9l-.75-2.25L2 6l2.25-.75z" />
-    <path d="M19 14l.75 2.25L22 17l-2.25.75L19 20l-.75-2.25L16 17l2.25-.75z" />
+const YouTubeIcon = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+    <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.8 31.8 0 0 0 0 12a31.8 31.8 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.8 31.8 0 0 0 24 12a31.8 31.8 0 0 0-.5-5.8ZM9.6 15.6V8.4L15.8 12l-6.2 3.6Z" />
   </svg>
 );
 
@@ -74,6 +72,7 @@ interface Props {
 
 export default function MiniDashboard({ profile }: Props) {
   const githubUrl = profile?.github_url || 'https://github.com/NickKhunapoj';
+  const youtubeUrl = 'https://www.youtube.com/@NickGOGOGO';
   // Extract username from github URL
   const githubUser = githubUrl.replace(/\/$/, '').split('/').pop() || 'NickKhunapoj';
 
@@ -110,7 +109,7 @@ export default function MiniDashboard({ profile }: Props) {
           </div>
           <p className={styles.cardValue}>@{githubUser}</p>
           <p className={styles.cardDesc}>
-            Open-source projects and personal tools. Stats load from your public GitHub profile.
+            15+ repositories and 650+ total contributions across open-source projects and personal tools.
           </p>
           <div className={styles.githubStatRow}>
             <div className={styles.statPill}>
@@ -141,7 +140,7 @@ export default function MiniDashboard({ profile }: Props) {
         <DashCard delay={0.2}>
           <div className={styles.cardIconRow}>
             <span className={`${styles.iconBubble} ${styles.iconBubbleGold}`}>
-              <SparklesIcon />
+              <YouTubeIcon />
             </span>
             <span className={styles.cardLabel}>Hobbies</span>
           </div>
@@ -156,6 +155,15 @@ export default function MiniDashboard({ profile }: Props) {
               </span>
             ))}
           </div>
+          <a
+            href={youtubeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.youtubeLink}
+            aria-label="Visit Nick GOGOGO on YouTube"
+          >
+            View Channel <ExternalLinkIcon />
+          </a>
         </DashCard>
 
       </div>

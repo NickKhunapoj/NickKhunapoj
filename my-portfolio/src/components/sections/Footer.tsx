@@ -27,7 +27,9 @@ export default function Footer() {
             Email
           </a>
         </div>
-        <p className={styles.text}>© {year} Khunapoj Suttenon. All rights reserved.</p>
+        <p className={styles.text}>
+          © {year} Khunapoj Suttenon. All rights reserved. <span style={{ opacity: 0.5, marginLeft: '8px' }}>v1.1.0</span>
+        </p>
       </div>
     </footer>
   );

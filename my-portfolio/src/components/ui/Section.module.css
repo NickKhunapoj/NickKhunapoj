@@ -9,21 +9,22 @@
 
 
 .header {
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-md);
 }
 
 .title {
   font-size: var(--text-3xl);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   color: var(--color-text-primary);
-  margin-bottom: var(--space-sm);
+  line-height: 1.15;
 }
 
 .subtitle {
-  font-size: var(--text-lg);
-  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
   font-weight: 400;
+  margin-top: 6px;
 }
 
 @media (max-width: 768px) {

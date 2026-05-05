@@ -72,8 +72,9 @@
   font-size: var(--text-6xl);
   font-weight: 800;
   letter-spacing: -0.03em;
-  line-height: 1.05;
-  margin-bottom: var(--space-md);
+  line-height: 1.12;
+  margin-bottom: var(--space-lg);
+  padding-bottom: 0.04em;
   background: linear-gradient(
     135deg,
     #f5f5f7 0%,
@@ -91,6 +92,7 @@
   font-size: var(--text-xl);
   color: var(--color-text-secondary);
   font-weight: 400;
+  line-height: 1.45;
   margin-bottom: var(--space-lg);
 }
 

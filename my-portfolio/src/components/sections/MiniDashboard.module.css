@@ -121,6 +121,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  margin-bottom: var(--space-md);
 }
 
 .tag {
@@ -190,6 +191,22 @@
 }
 
 .githubLink:hover {
+  opacity: 1;
+}
+
+.youtubeLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: #ff453a;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: opacity var(--transition-fast);
+}
+
+.youtubeLink:hover {
   opacity: 1;
 }
 

@@ -43,7 +43,7 @@ export default function Hero({ profile }: HeroProps) {
 
   const handleExploreClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const target = document.getElementById('projects');
+    const target = document.getElementById('about');
     if (target) {
       target.scrollIntoView({ behavior: 'smooth' });
     }
@@ -103,11 +103,11 @@ export default function Hero({ profile }: HeroProps) {
           variants={stagger}
         >
           <a
-            href="#projects"
+            href="#about"
             onClick={handleExploreClick}
             className={`${styles.exploreBtn} ${styles.exploreBtnPrimary}`}
           >
-            View Projects
+            Explore More
           </a>
           <a href={`mailto:${email}`} className={`${styles.exploreBtn} ${styles.exploreBtnSecondary}`}>
             Get in Touch

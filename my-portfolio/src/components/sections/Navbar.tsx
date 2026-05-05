@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMotion } from '@/components/ui/MotionProvider';
@@ -8,8 +9,8 @@ import styles from './Navbar.module.css';
 
 const NAV_ITEMS = [
   { label: 'About', href: '#about' },
+  { label: 'Projects', href: '#projects' },
   { label: 'Awards', href: '#awards' },
-  { label: 'Certifications', href: '#certifications' },
 ];
 
 export default function Navbar() {
@@ -75,6 +76,24 @@ export default function Navbar() {
 
   const closeMobile = useCallback(() => setMobileOpen(false), []);
 
+  const scrollToSection = useCallback((href: string) => {
+    const id = href.slice(1);
+    const target = document.getElementById(id);
+    if (!target) return;
+
+    target.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' });
+    setActiveSection(id);
+
+    if (window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  }, [reducedMotion]);
+
+  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    scrollToSection(href);
+  }, [scrollToSection]);
+
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     const newCount = clickCount + 1;
@@ -102,7 +121,14 @@ export default function Navbar() {
       <nav className={`${styles.nav} ${scrolled ? styles.navScrolled : ''}`}>
         <div className={styles.inner}>
           <a href="#hero" className={styles.logo} onClick={handleLogoClick}>
-            K.S.
+            <Image
+              src="/nickgogogo-logo-circle.png"
+              alt="Khunapoj Suttenon"
+              width={40}
+              height={40}
+              priority
+              className={styles.logoImage}
+            />
           </a>
 
           {/* Desktop links */}
@@ -111,6 +137,7 @@ export default function Navbar() {
               <a
                 key={item.href}
                 href={item.href}
+                onClick={(e) => handleNavClick(e, item.href)}
                 className={`${styles.link} ${
                   activeSection === item.href.slice(1) ? styles.linkActive : ''
                 }`}
@@ -192,7 +219,10 @@ export default function Navbar() {
                     className={`${styles.drawerLink} ${
                       activeSection === item.href.slice(1) ? styles.drawerLinkActive : ''
                     }`}
-                    onClick={closeMobile}
+                    onClick={(e) => {
+                      handleNavClick(e, item.href);
+                      closeMobile();
+                    }}
                     initial={{ opacity: 0, x: reducedMotion ? 0 : 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: reducedMotion ? 0 : 0.1 + i * 0.06, duration: reducedMotion ? 0 : 0.3 }}

@@ -96,7 +96,7 @@ export default function SkillSection({ data }: Props) {
   return (
     <section id="skills" className={styles.section}>
       <div className="container">
-        <h2 className={styles.sectionTitle}>Expertise</h2>
+        <h2 className={styles.sectionTitle}>Skills</h2>
 
         {categories.length === 0 ? (
           <EmptyState icon="⚡" message="No skills listed yet." />

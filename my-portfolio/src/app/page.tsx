@@ -101,7 +101,7 @@ export default async function Home() {
         <div className="section-divider" />
 
         {/* ── Awards carousel ── */}
-        <div className={styles.carouselSection} id="awards">
+        <div className={styles.carouselSection}>
           <AwardSection data={awards} />
         </div>
 

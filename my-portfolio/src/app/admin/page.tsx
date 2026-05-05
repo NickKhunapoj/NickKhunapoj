@@ -12,6 +12,25 @@ import Skeleton from '@/components/ui/Skeleton';
 import { useToast } from '@/components/ui/Toast';
 import styles from './admin.module.css';
 
+// DND Kit imports
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
 export default function AdminDashboard() {
   const router = useRouter();
   const supabase = createClient();
@@ -58,91 +77,68 @@ export default function AdminDashboard() {
   };
 
   const openCreateModal = () => {
-    const defaults: Record<string, unknown> = {};
-    currentCategory.fields.forEach((f) => {
-      if (f.type === 'toggle') defaults[f.name] = true;
-      else if (f.type === 'number') defaults[f.name] = 0;
-      else if (f.type === 'json-array') defaults[f.name] = ''; // must stay string for .split()
-      else if (f.type === 'gallery') defaults[f.name] = [];    // stays as string[]
-      else defaults[f.name] = '';
-    });
-    setFormData(defaults);
     setEditingItem(null);
+    setFormData({});
     setModalOpen(true);
   };
 
   const openEditModal = (item: Record<string, unknown>) => {
-    const data: Record<string, unknown> = {};
-    currentCategory.fields.forEach((f) => {
-      if (f.type === 'json-array') {
-        const arr = Array.isArray(item[f.name]) ? (item[f.name] as string[]) : [];
-        data[f.name] = arr.join('\n');
-      } else if (f.type === 'gallery') {
-        // gallery stays as string[]
-        data[f.name] = Array.isArray(item[f.name]) ? item[f.name] : [];
-      } else {
-        data[f.name] = item[f.name] ?? '';
-      }
-    });
-    setFormData(data);
     setEditingItem(item);
+    setFormData(item);
     setModalOpen(true);
   };
 
-  const handleSave = async () => {
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
     setSaving(true);
 
-    const payload: Record<string, unknown> = {};
-    currentCategory.fields.forEach((f) => {
-      if (f.type === 'json-array') {
-        const str = (formData[f.name] as string) || '';
-        payload[f.name] = str
-          .split('\n')
-          .map((s) => s.trim())
-          .filter(Boolean);
-      } else if (f.type === 'gallery') {
-        // gallery is already string[]
-        payload[f.name] = Array.isArray(formData[f.name]) ? formData[f.name] : [];
-      } else if (f.type === 'number') {
-        payload[f.name] = Number(formData[f.name]) || 0;
-      } else if (f.type === 'toggle') {
-        payload[f.name] = formData[f.name];
-      } else if (f.type === 'date') {
-        payload[f.name] = formData[f.name] || null;
+    try {
+      if (editingItem) {
+        const { error } = await supabase
+          .from(activeCategory)
+          .update(formData)
+          .eq('id', editingItem.id);
+        if (error) throw error;
+        addToast('Item updated successfully', 'success');
       } else {
-        payload[f.name] = formData[f.name] || null;
+        // Find max order
+        const { data: maxOrderData } = await supabase
+          .from(activeCategory)
+          .select('sort_order')
+          .order('sort_order', { ascending: false })
+          .limit(1);
+        
+        let newOrder = 0;
+        if (maxOrderData && maxOrderData.length > 0 && maxOrderData[0].sort_order !== undefined) {
+          newOrder = maxOrderData[0].sort_order + 1;
+        }
+
+        const dataToInsert = { ...formData };
+        if (activeCategory !== 'profiles') {
+          dataToInsert.sort_order = newOrder;
+        }
+
+        const { error } = await supabase.from(activeCategory).insert([dataToInsert]);
+        if (error) throw error;
+        addToast('Item created successfully', 'success');
       }
-    });
-
-    let error;
-    if (editingItem) {
-      const result = await supabase
-        .from(activeCategory)
-        .update(payload)
-        .eq('id', editingItem.id as string);
-      error = result.error;
-    } else {
-      const result = await supabase.from(activeCategory).insert(payload);
-      error = result.error;
-    }
-
-    if (error) {
-      addToast(`Error: ${error.message}`, 'error');
-    } else {
-      addToast(`Successfully ${editingItem ? 'updated' : 'created'} item.`, 'success');
       setModalOpen(false);
       fetchItems();
+    } catch (err: any) {
+      addToast(`Error: ${err.message}`, 'error');
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this item?')) return;
+    if (!window.confirm('Are you sure you want to delete this item?')) return;
+
     const { error } = await supabase.from(activeCategory).delete().eq('id', id);
     if (error) {
-      addToast(`Error deleting: ${error.message}`, 'error');
+      addToast(`Error: ${error.message}`, 'error');
     } else {
-      addToast('Item deleted.', 'success');
+      addToast('Item deleted', 'success');
       fetchItems();
     }
   };
@@ -167,6 +163,48 @@ export default function AdminDashboard() {
 
   // Allow only 1 profile
   const canAddNew = !(activeCategory === 'profiles' && items.length > 0);
+
+  // DND setup
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      let newItems = [...items];
+      const oldIndex = items.findIndex((i) => i.id === active.id);
+      const newIndex = items.findIndex((i) => i.id === over.id);
+
+      newItems = arrayMove(newItems, oldIndex, newIndex);
+      setItems(newItems);
+
+      // Save to Supabase
+      if (activeCategory !== 'profiles') {
+        let hasError = false;
+        for (let i = 0; i < newItems.length; i++) {
+          const item = newItems[i];
+          if (item.sort_order !== i) {
+            const { error } = await supabase
+              .from(activeCategory)
+              .update({ sort_order: i })
+              .eq('id', item.id);
+            if (error) hasError = true;
+          }
+        }
+        if (hasError) {
+          addToast('Failed to save some sort orders', 'error');
+        } else {
+          addToast('Order saved successfully', 'success');
+        }
+        fetchItems(); // refresh to get consistent state
+      }
+    }
+  };
 
   return (
     <div className={styles.adminLayout}>
@@ -259,58 +297,39 @@ export default function AdminDashboard() {
                 <table className={styles.table}>
                   <thead>
                     <tr>
+                      {activeCategory !== 'profiles' && <th>☰</th>}
                       {displayFields.map((f) => (
                         <th key={f.name}>{f.label}</th>
                       ))}
-                      {activeCategory !== 'profiles' && <th>Order</th>}
                       <th>Status</th>
                       <th>Updated</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {items.map((item) => (
-                      <tr key={item.id as string}>
-                        {displayFields.map((f) => (
-                          <td key={f.name}>
-                            {String(item[f.name] ?? '—')}
-                          </td>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={items.map((i) => i.id as string)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <tbody>
+                        {items.map((item) => (
+                          <SortableRow
+                            key={item.id as string}
+                            item={item}
+                            activeCategory={activeCategory}
+                            displayFields={displayFields}
+                            toggleActive={toggleActive}
+                            openEditModal={openEditModal}
+                            handleDelete={handleDelete}
+                          />
                         ))}
-                        {activeCategory !== 'profiles' && <td>{String(item.sort_order ?? 0)}</td>}
-                        <td>
-                          <button
-                            className={`${styles.statusBadge} ${
-                              item.is_active ? styles.statusActive : styles.statusInactive
-                            }`}
-                            onClick={() =>
-                              toggleActive(item.id as string, item.is_active as boolean)
-                            }
-                          >
-                            {item.is_active ? '● Active' : '○ Inactive'}
-                          </button>
-                        </td>
-                        <td style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
-                          {formatFullDate(item.updated_at as string)}
-                        </td>
-                        <td>
-                          <div className={styles.actions}>
-                            <button
-                              className={styles.actionBtn}
-                              onClick={() => openEditModal(item)}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
-                              onClick={() => handleDelete(item.id as string)}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
+                      </tbody>
+                    </SortableContext>
+                  </DndContext>
                 </table>
               </div>
             )}
@@ -350,21 +369,12 @@ export default function AdminDashboard() {
                 />
               ))}
 
-              <div className={styles.formActions}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setModalOpen(false)}
-                >
+              <div className={styles.modalActions}>
+                <Button type="button" variant="ghost" onClick={() => setModalOpen(false)}>
                   Cancel
                 </Button>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={handleSave}
-                  disabled={saving}
-                >
-                  {saving ? 'Saving…' : editingItem ? 'Update' : 'Create'}
+                <Button type="button" variant="primary" onClick={handleSave} disabled={saving}>
+                  {saving ? 'Saving...' : 'Save'}
                 </Button>
               </div>
             </motion.div>
@@ -375,7 +385,89 @@ export default function AdminDashboard() {
   );
 }
 
-// Form field renderer
+/* ── Sortable Row Component ── */
+function SortableRow({
+  item,
+  activeCategory,
+  displayFields,
+  toggleActive,
+  openEditModal,
+  handleDelete,
+}: {
+  item: Record<string, unknown>;
+  activeCategory: string;
+  displayFields: FieldConfig[];
+  toggleActive: (id: string, active: boolean) => void;
+  openEditModal: (item: Record<string, unknown>) => void;
+  handleDelete: (id: string) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id as string });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    backgroundColor: isDragging ? 'var(--color-bg)' : undefined,
+    position: isDragging ? ('relative' as const) : undefined,
+    zIndex: isDragging ? 99 : undefined,
+  };
+
+  return (
+    <tr ref={setNodeRef} style={style}>
+      {activeCategory !== 'profiles' && (
+        <td
+          style={{ width: 40, cursor: 'grab' }}
+          {...attributes}
+          {...listeners}
+          aria-label="Drag to reorder"
+        >
+          <span style={{ opacity: 0.5, padding: '4px 8px' }}>☰</span>
+        </td>
+      )}
+      {displayFields.map((f) => (
+        <td key={f.name}>{String(item[f.name] ?? '—')}</td>
+      ))}
+      <td>
+        <button
+          className={`${styles.statusBadge} ${
+            item.is_active ? styles.statusActive : styles.statusInactive
+          }`}
+          onClick={() => toggleActive(item.id as string, item.is_active as boolean)}
+        >
+          {item.is_active ? '● Active' : '○ Inactive'}
+        </button>
+      </td>
+      <td style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
+        {formatFullDate(item.updated_at as string)}
+      </td>
+      <td>
+        <div className={styles.actions}>
+          <button
+            className={styles.actionBtn}
+            onClick={() => openEditModal(item)}
+          >
+            Edit
+          </button>
+          <button
+            className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
+            onClick={() => handleDelete(item.id as string)}
+          >
+            Delete
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+/* ── Reusable FormField ── */
 function FormField({
   field,
   value,
@@ -481,21 +573,14 @@ function FormField({
       <div className={styles.formField}>
         <label className={styles.formLabel}>{field.label}</label>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <input
-            type="text"
-            className={styles.formInput}
-            value={imageUrl}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder="Or enter URL directly..."
-          />
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
             <Button type="button" variant="secondary" size="sm" disabled={uploading}>
-              {uploading ? 'Uploading...' : 'Upload'}
+              {uploading ? 'Uploading...' : 'Choose Image'}
             </Button>
             <input
               type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              onChange={(e) => handleFileUpload(e, 'image/*')}
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(e) => handleFileUpload(e, '*/*')}
               disabled={uploading}
               style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
             />
@@ -604,21 +689,14 @@ function FormField({
 
   return (
     <div className={styles.formField}>
-      <label className={styles.formLabel}>
-        {field.label}
-        {field.required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
-      </label>
+      <label className={styles.formLabel}>{field.label}</label>
       <input
-        type={field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : field.type === 'url' ? 'url' : 'text'}
+        type="text"
         className={styles.formInput}
         value={String(value ?? '')}
-        onChange={(e) =>
-          onChange(field.type === 'number' ? Number(e.target.value) : e.target.value)
-        }
+        onChange={(e) => onChange(e.target.value)}
         placeholder={field.placeholder}
-        required={field.required}
       />
     </div>
   );
 }
-

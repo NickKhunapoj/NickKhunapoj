@@ -40,19 +40,11 @@ export default function HorizontalShowcase({
   const [modal, setModal] = useState<DetailModalData | null>(null);
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
-  // We clone items to create 3 sets for infinite scroll looping
-  const clonedItems = [...items, ...items, ...items];
-  const itemsCount = items.length;
-
-  // Initialize scroll position to the middle set
+  // Initialize scroll position with the first item centered.
   useLayoutEffect(() => {
     if (!trackRef.current || items.length === 0) return;
     const el = trackRef.current;
-    
-    // We want to scroll to the first item of the middle set.
-    // That item's index in clonedItems is `items.length`.
-    const middleStartIndex = items.length;
-    const targetCard = el.children[middleStartIndex] as HTMLElement;
+    const targetCard = el.children[0] as HTMLElement;
     
     if (targetCard) {
       // Temporarily disable snapping to avoid jumping
@@ -64,6 +56,7 @@ export default function HorizontalShowcase({
       requestAnimationFrame(() => {
         el.style.scrollSnapType = 'x mandatory';
       });
+      setActiveIndex(0);
     }
   }, [items.length]);
 
@@ -97,38 +90,18 @@ export default function HorizontalShowcase({
     return () => observer.disconnect();
   }, [items.length]);
 
-  // Handle infinite scroll loop
-  const handleScroll = useCallback(() => {
-    if (!trackRef.current) return;
-    const el = trackRef.current;
-    const oneSetWidth = el.scrollWidth / 3;
-
-    // If scrolled too far left (into the first set)
-    if (el.scrollLeft < oneSetWidth * 0.5) {
-      el.style.scrollSnapType = 'none';
-      el.scrollLeft += oneSetWidth;
-      requestAnimationFrame(() => { el.style.scrollSnapType = 'x mandatory'; });
-    }
-    // If scrolled too far right (into the third set)
-    else if (el.scrollLeft > oneSetWidth * 2.5) {
-      el.style.scrollSnapType = 'none';
-      el.scrollLeft -= oneSetWidth;
-      requestAnimationFrame(() => { el.style.scrollSnapType = 'x mandatory'; });
-    }
-  }, []);
-
-  const scrollLeft = () => {
+  const scrollLeft = useCallback(() => {
     if (trackRef.current) {
       // scroll by roughly one card width; native snapping will correct it to the exact card
       trackRef.current.scrollBy({ left: -320, behavior: 'smooth' });
     }
-  };
+  }, []);
 
-  const scrollRight = () => {
+  const scrollRight = useCallback(() => {
     if (trackRef.current) {
       trackRef.current.scrollBy({ left: 320, behavior: 'smooth' });
     }
-  };
+  }, []);
 
   if (items.length === 0) {
     return (
@@ -160,20 +133,18 @@ export default function HorizontalShowcase({
         <div
           ref={trackRef}
           className={styles.track}
-          onScroll={handleScroll}
           role="region"
           aria-label={`${title} carousel`}
           tabIndex={0}
         >
-          {clonedItems.map((item, index) => {
-            const originalIndex = index % itemsCount;
-            const isActive = originalIndex === activeIndex;
+          {items.map((item, index) => {
+            const isActive = index === activeIndex;
 
             return (
               <ShowcaseCard
-                key={`${item.id}-clone-${index}`}
+                key={item.id}
                 item={item}
-                originalIndex={originalIndex}
+                originalIndex={index}
                 isActive={isActive}
                 onOpen={() => {
                   // Only allow opening if it is the currently active (centered) item
