@@ -350,6 +350,117 @@
   font-family: inherit;
 }
 
+/* Resume / file upload */
+.fileUploadPanel,
+.resumeUploadPanel {
+  position: relative;
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  overflow: hidden;
+}
+
+.resumeUploadPanel {
+  border-color: rgba(41, 151, 255, 0.22);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(41, 151, 255, 0.16), transparent 42%),
+    var(--glass-bg);
+}
+
+.fileUploadHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.fileUploadIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(41, 151, 255, 0.12);
+  border: 1px solid rgba(41, 151, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.fileUploadText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.fileUploadTitle {
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.fileUploadHint {
+  color: var(--color-text-tertiary);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.fileCurrent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 9px 11px;
+  margin-bottom: var(--space-md);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.fileCurrentName {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  min-width: 0;
+}
+
+.fileActions,
+.fileUploadActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.fileActionLink {
+  color: var(--color-accent);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.fileActionLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.fileRemoveBtn {
+  color: var(--color-danger);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.fileInputWrap {
+  position: relative;
+  display: inline-block;
+}
+
+.hiddenFileInput {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
 /* Toggle Switch */
 .formToggle {
   display: flex;
