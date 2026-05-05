@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Manrope, Kanit } from 'next/font/google';
+import { MotionProvider } from '@/components/ui/MotionProvider';
 import './globals.css';
 
 const manrope = Manrope({
@@ -21,6 +22,11 @@ export const metadata: Metadata = {
     'Computer Engineering student & Web Developer. Explore my projects, skills, certifications, and achievements.',
   keywords: ['portfolio', 'computer engineering', 'web developer', 'Khunapoj Suttenon'],
   authors: [{ name: 'Khunapoj Suttenon' }],
+  icons: {
+    icon: '/nickgogogo-logo-circle.png',
+    shortcut: '/nickgogogo-logo-circle.png',
+    apple: '/nickgogogo-logo-circle.png',
+  },
   openGraph: {
     title: 'Khunapoj Suttenon — Portfolio',
     description:
@@ -36,7 +42,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${manrope.variable} ${kanit.variable}`}>
-      <body>{children}</body>
+      <body>
+        <MotionProvider>{children}</MotionProvider>
+      </body>
     </html>
   );
 }

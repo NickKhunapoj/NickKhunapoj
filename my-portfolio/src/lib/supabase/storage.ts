@@ -1,6 +1,6 @@
 import { createClient } from './client';
 
-export async function uploadImage(file: File): Promise<string | null> {
+export async function uploadFile(file: File): Promise<string | null> {
   const supabase = createClient();
   const fileExt = file.name.split('.').pop();
   const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
@@ -14,7 +14,7 @@ export async function uploadImage(file: File): Promise<string | null> {
     });
 
   if (uploadError) {
-    console.error('Error uploading image:', uploadError.message);
+    console.error('Error uploading file:', uploadError.message);
     return null;
   }
 

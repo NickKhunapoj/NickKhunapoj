@@ -9,8 +9,11 @@ This project features a fully responsive, dark-mode design with smooth animation
 - **Apple-Inspired Design:** Minimalist dark mode with subtle mesh gradients, glassmorphism, and 3D hover effects.
 - **Smooth Animations:** Framer Motion scroll reveals, floating elements, and seamless transitions.
 - **Dynamic Content:** All sections (About, Awards, Certifications) are dynamically rendered from a Supabase backend.
-- **Admin Dashboard:** A responsive, grouped sidebar dashboard for full CRUD control (Profiles, Education, Experience, Projects, Skills, Courses, Awards, Certifications, Test Scores).
+- **Interactive Showcase:** Projects and Awards use a rotating carousel/tab system with auto-play and smooth transitions.
+- **Image Lightbox:** Clickable images in Projects and Awards open a polished fullscreen viewer with keyboard navigation.
+- **Admin Dashboard:** A responsive, grouped sidebar dashboard for full CRUD control (Profiles, Education, Experience, Projects, Skills, Awards, Certifications, Test Scores).
 - **Secure Access:** Supabase Row Level Security (RLS) ensures public users only see active content, while authenticated admins can manage records.
+- **Reduced-Motion Toggle:** A manual toggle (in navbar and mobile menu) to disable heavy animations for lower-spec devices. Also respects the system `prefers-reduced-motion` setting.
 
 ## Setup Instructions
 
@@ -25,7 +28,7 @@ This project requires a Supabase project.
 5. Click **Run** to execute the script.
 
 This script will:
-- Create all 9 required tables (`profiles`, `education`, `experiences`, `certifications`, `projects`, `skills`, `courses`, `awards`, `test_scores`).
+- Create all required tables (`profiles`, `education`, `experiences`, `certifications`, `projects`, `skills`, `awards`, `test_scores`).
 - Enable Row Level Security (RLS) on all tables.
 - Create policies for public read access (where `is_active = true`) and full admin access.
 - Set up automatic `updated_at` triggers.
@@ -53,12 +56,18 @@ Visit `http://localhost:3000/admin` to access the admin dashboard.
 
 ## Tech Stack
 
-- **Framework:** Next.js 14+ (App Router)
+- **Framework:** Next.js 16+ (App Router)
 - **Language:** TypeScript
 - **Database:** Supabase (PostgreSQL)
 - **Styling:** CSS Modules with Global Variables
 - **Animations:** Framer Motion
 - **Deployment:** Vercel
+
+## Accessibility
+
+- **Reduced-Motion Toggle:** Click the ✦ icon in the desktop navbar or use the toggle in the mobile menu to reduce/disable animations. The preference is saved to localStorage and also respects the OS-level reduced motion setting.
+- **Image Lightbox:** Supports keyboard navigation (ESC to close, arrow keys to navigate). All interactive elements have ARIA labels.
+- **Mobile Menu:** Full drawer with keyboard focus trapping, ESC to close, and touch-friendly controls.
 
 ## Deployment
 

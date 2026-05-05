@@ -12,6 +12,25 @@ import Skeleton from '@/components/ui/Skeleton';
 import { useToast } from '@/components/ui/Toast';
 import styles from './admin.module.css';
 
+// DND Kit imports
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
 export default function AdminDashboard() {
   const router = useRouter();
   const supabase = createClient();
@@ -58,84 +77,68 @@ export default function AdminDashboard() {
   };
 
   const openCreateModal = () => {
-    const defaults: Record<string, unknown> = {};
-    currentCategory.fields.forEach((f) => {
-      if (f.type === 'toggle') defaults[f.name] = true;
-      else if (f.type === 'number') defaults[f.name] = 0;
-      else if (f.type === 'json-array') defaults[f.name] = '';
-      else defaults[f.name] = '';
-    });
-    setFormData(defaults);
     setEditingItem(null);
+    setFormData({});
     setModalOpen(true);
   };
 
   const openEditModal = (item: Record<string, unknown>) => {
-    const data: Record<string, unknown> = {};
-    currentCategory.fields.forEach((f) => {
-      if (f.type === 'json-array') {
-        const arr = Array.isArray(item[f.name]) ? (item[f.name] as string[]) : [];
-        data[f.name] = arr.join('\n');
-      } else {
-        data[f.name] = item[f.name] ?? '';
-      }
-    });
-    setFormData(data);
     setEditingItem(item);
+    setFormData(item);
     setModalOpen(true);
   };
 
-  const handleSave = async () => {
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
     setSaving(true);
 
-    const payload: Record<string, unknown> = {};
-    currentCategory.fields.forEach((f) => {
-      if (f.type === 'json-array') {
-        const str = (formData[f.name] as string) || '';
-        payload[f.name] = str
-          .split('\n')
-          .map((s) => s.trim())
-          .filter(Boolean);
-      } else if (f.type === 'number') {
-        payload[f.name] = Number(formData[f.name]) || 0;
-      } else if (f.type === 'toggle') {
-        payload[f.name] = formData[f.name];
-      } else if (f.type === 'date') {
-        payload[f.name] = formData[f.name] || null;
+    try {
+      if (editingItem) {
+        const { error } = await supabase
+          .from(activeCategory)
+          .update(formData)
+          .eq('id', editingItem.id);
+        if (error) throw error;
+        addToast('Item updated successfully', 'success');
       } else {
-        payload[f.name] = formData[f.name] || null;
+        // Find max order
+        const { data: maxOrderData } = await supabase
+          .from(activeCategory)
+          .select('sort_order')
+          .order('sort_order', { ascending: false })
+          .limit(1);
+        
+        let newOrder = 0;
+        if (maxOrderData && maxOrderData.length > 0 && maxOrderData[0].sort_order !== undefined) {
+          newOrder = maxOrderData[0].sort_order + 1;
+        }
+
+        const dataToInsert = { ...formData };
+        if (activeCategory !== 'profiles') {
+          dataToInsert.sort_order = newOrder;
+        }
+
+        const { error } = await supabase.from(activeCategory).insert([dataToInsert]);
+        if (error) throw error;
+        addToast('Item created successfully', 'success');
       }
-    });
-
-    let error;
-    if (editingItem) {
-      const result = await supabase
-        .from(activeCategory)
-        .update(payload)
-        .eq('id', editingItem.id as string);
-      error = result.error;
-    } else {
-      const result = await supabase.from(activeCategory).insert(payload);
-      error = result.error;
-    }
-
-    if (error) {
-      addToast(`Error: ${error.message}`, 'error');
-    } else {
-      addToast(`Successfully ${editingItem ? 'updated' : 'created'} item.`, 'success');
       setModalOpen(false);
       fetchItems();
+    } catch (err: any) {
+      addToast(`Error: ${err.message}`, 'error');
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this item?')) return;
+    if (!window.confirm('Are you sure you want to delete this item?')) return;
+
     const { error } = await supabase.from(activeCategory).delete().eq('id', id);
     if (error) {
-      addToast(`Error deleting: ${error.message}`, 'error');
+      addToast(`Error: ${error.message}`, 'error');
     } else {
-      addToast('Item deleted.', 'success');
+      addToast('Item deleted', 'success');
       fetchItems();
     }
   };
@@ -155,11 +158,53 @@ export default function AdminDashboard() {
 
   // Only show first few fields in table
   const displayFields = currentCategory.fields.filter(
-    (f) => f.type !== 'toggle' && f.type !== 'json-array' && f.type !== 'textarea'
+    (f) => f.type !== 'toggle' && f.type !== 'json-array' && f.type !== 'textarea' && f.type !== 'gallery' && f.type !== 'image' && f.type !== 'file'
   ).slice(0, 3);
 
   // Allow only 1 profile
   const canAddNew = !(activeCategory === 'profiles' && items.length > 0);
+
+  // DND setup
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      let newItems = [...items];
+      const oldIndex = items.findIndex((i) => i.id === active.id);
+      const newIndex = items.findIndex((i) => i.id === over.id);
+
+      newItems = arrayMove(newItems, oldIndex, newIndex);
+      setItems(newItems);
+
+      // Save to Supabase
+      if (activeCategory !== 'profiles') {
+        let hasError = false;
+        for (let i = 0; i < newItems.length; i++) {
+          const item = newItems[i];
+          if (item.sort_order !== i) {
+            const { error } = await supabase
+              .from(activeCategory)
+              .update({ sort_order: i })
+              .eq('id', item.id);
+            if (error) hasError = true;
+          }
+        }
+        if (hasError) {
+          addToast('Failed to save some sort orders', 'error');
+        } else {
+          addToast('Order saved successfully', 'success');
+        }
+        fetchItems(); // refresh to get consistent state
+      }
+    }
+  };
 
   return (
     <div className={styles.adminLayout}>
@@ -252,58 +297,39 @@ export default function AdminDashboard() {
                 <table className={styles.table}>
                   <thead>
                     <tr>
+                      {activeCategory !== 'profiles' && <th>☰</th>}
                       {displayFields.map((f) => (
                         <th key={f.name}>{f.label}</th>
                       ))}
-                      {activeCategory !== 'profiles' && <th>Order</th>}
                       <th>Status</th>
                       <th>Updated</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {items.map((item) => (
-                      <tr key={item.id as string}>
-                        {displayFields.map((f) => (
-                          <td key={f.name}>
-                            {String(item[f.name] ?? '—')}
-                          </td>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={items.map((i) => i.id as string)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <tbody>
+                        {items.map((item) => (
+                          <SortableRow
+                            key={item.id as string}
+                            item={item}
+                            activeCategory={activeCategory}
+                            displayFields={displayFields}
+                            toggleActive={toggleActive}
+                            openEditModal={openEditModal}
+                            handleDelete={handleDelete}
+                          />
                         ))}
-                        {activeCategory !== 'profiles' && <td>{String(item.sort_order ?? 0)}</td>}
-                        <td>
-                          <button
-                            className={`${styles.statusBadge} ${
-                              item.is_active ? styles.statusActive : styles.statusInactive
-                            }`}
-                            onClick={() =>
-                              toggleActive(item.id as string, item.is_active as boolean)
-                            }
-                          >
-                            {item.is_active ? '● Active' : '○ Inactive'}
-                          </button>
-                        </td>
-                        <td style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
-                          {formatFullDate(item.updated_at as string)}
-                        </td>
-                        <td>
-                          <div className={styles.actions}>
-                            <button
-                              className={styles.actionBtn}
-                              onClick={() => openEditModal(item)}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
-                              onClick={() => handleDelete(item.id as string)}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
+                      </tbody>
+                    </SortableContext>
+                  </DndContext>
                 </table>
               </div>
             )}
@@ -343,21 +369,12 @@ export default function AdminDashboard() {
                 />
               ))}
 
-              <div className={styles.formActions}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setModalOpen(false)}
-                >
+              <div className={styles.modalActions}>
+                <Button type="button" variant="ghost" onClick={() => setModalOpen(false)}>
                   Cancel
                 </Button>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={handleSave}
-                  disabled={saving}
-                >
-                  {saving ? 'Saving…' : editingItem ? 'Update' : 'Create'}
+                <Button type="button" variant="primary" onClick={handleSave} disabled={saving}>
+                  {saving ? 'Saving...' : 'Save'}
                 </Button>
               </div>
             </motion.div>
@@ -368,7 +385,89 @@ export default function AdminDashboard() {
   );
 }
 
-// Form field renderer
+/* ── Sortable Row Component ── */
+function SortableRow({
+  item,
+  activeCategory,
+  displayFields,
+  toggleActive,
+  openEditModal,
+  handleDelete,
+}: {
+  item: Record<string, unknown>;
+  activeCategory: string;
+  displayFields: FieldConfig[];
+  toggleActive: (id: string, active: boolean) => void;
+  openEditModal: (item: Record<string, unknown>) => void;
+  handleDelete: (id: string) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id as string });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    backgroundColor: isDragging ? 'var(--color-bg)' : undefined,
+    position: isDragging ? ('relative' as const) : undefined,
+    zIndex: isDragging ? 99 : undefined,
+  };
+
+  return (
+    <tr ref={setNodeRef} style={style}>
+      {activeCategory !== 'profiles' && (
+        <td
+          style={{ width: 40, cursor: 'grab' }}
+          {...attributes}
+          {...listeners}
+          aria-label="Drag to reorder"
+        >
+          <span style={{ opacity: 0.5, padding: '4px 8px' }}>☰</span>
+        </td>
+      )}
+      {displayFields.map((f) => (
+        <td key={f.name}>{String(item[f.name] ?? '—')}</td>
+      ))}
+      <td>
+        <button
+          className={`${styles.statusBadge} ${
+            item.is_active ? styles.statusActive : styles.statusInactive
+          }`}
+          onClick={() => toggleActive(item.id as string, item.is_active as boolean)}
+        >
+          {item.is_active ? '● Active' : '○ Inactive'}
+        </button>
+      </td>
+      <td style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
+        {formatFullDate(item.updated_at as string)}
+      </td>
+      <td>
+        <div className={styles.actions}>
+          <button
+            className={styles.actionBtn}
+            onClick={() => openEditModal(item)}
+          >
+            Edit
+          </button>
+          <button
+            className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
+            onClick={() => handleDelete(item.id as string)}
+          >
+            Delete
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+/* ── Reusable FormField ── */
 function FormField({
   field,
   value,
@@ -379,20 +478,54 @@ function FormField({
   onChange: (val: unknown) => void;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, acceptType: string) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
-    
+
+    // Validate for PDF
+    if (acceptType === 'application/pdf' && file.type !== 'application/pdf') {
+      alert('Please upload a PDF file only.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File is too large. Maximum size is 10 MB.');
+      return;
+    }
+
     setUploading(true);
-    const { uploadImage } = await import('@/lib/supabase/storage');
-    const url = await uploadImage(file);
+    const { uploadFile } = await import('@/lib/supabase/storage');
+    const url = await uploadFile(file);
     if (url) {
       onChange(url);
     } else {
-      alert('Failed to upload image.');
+      alert('Failed to upload file.');
     }
     setUploading(false);
+    e.target.value = '';
+  };
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const files = Array.from(e.target.files);
+    if (files.some(f => f.size > 10 * 1024 * 1024)) {
+      alert('One or more files exceed the 10 MB limit.');
+      return;
+    }
+
+    setUploadingGallery(true);
+    const { uploadFile } = await import('@/lib/supabase/storage');
+    const current = Array.isArray(value) ? (value as string[]) : [];
+    const uploaded: string[] = [];
+
+    for (const file of files) {
+      const url = await uploadFile(file);
+      if (url) uploaded.push(url);
+    }
+    onChange([...current, ...uploaded]);
+    setUploadingGallery(false);
+    e.target.value = '';
   };
 
   if (field.type === 'toggle') {
@@ -435,59 +568,134 @@ function FormField({
   }
 
   if (field.type === 'image') {
+    const imageUrl = typeof value === 'string' ? value : '';
     return (
       <div className={styles.formField}>
         <label className={styles.formLabel}>{field.label}</label>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <input
-            type="text"
-            className={styles.formInput}
-            value={String(value ?? '')}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder="Or enter URL directly..."
-          />
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
             <Button type="button" variant="secondary" size="sm" disabled={uploading}>
-              {uploading ? 'Uploading...' : 'Upload'}
+              {uploading ? 'Uploading...' : 'Choose Image'}
             </Button>
             <input
               type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(e) => handleFileUpload(e, '*/*')}
               disabled={uploading}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                opacity: 0,
-                cursor: 'pointer'
-              }}
+              style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
             />
           </div>
+          {imageUrl && (
+            <button type="button" onClick={() => onChange('')} style={{ color: 'var(--color-danger)', fontSize: 'var(--text-xs)', flexShrink: 0 }}>
+              ✕ Remove
+            </button>
+          )}
         </div>
-        {value && (
+        {imageUrl && (
           <div style={{ marginTop: '8px', borderRadius: '8px', overflow: 'hidden', width: '80px', height: '80px', border: '1px solid var(--color-border)' }}>
-            <img src={String(value)} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={imageUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         )}
       </div>
     );
   }
 
+  if (field.type === 'file') {
+    const fileUrl = typeof value === 'string' ? value : '';
+    const isPdf = field.accept === 'application/pdf';
+    return (
+      <div className={styles.formField}>
+        <label className={styles.formLabel}>{field.label}</label>
+        {fileUrl && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, padding: '8px 12px', background: 'var(--glass-bg)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', flex: 1 }}>
+              {isPdf ? '📄 Resume uploaded' : '📎 File uploaded'}
+            </span>
+            <a href={fileUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 'var(--text-xs)', color: 'var(--color-accent)' }}>
+              View ↗
+            </a>
+            <button type="button" onClick={() => onChange('')} style={{ fontSize: 'var(--text-xs)', color: 'var(--color-danger)', marginLeft: 4 }}>
+              ✕ Remove
+            </button>
+          </div>
+        )}
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          <Button type="button" variant="secondary" size="sm" disabled={uploading}>
+            {uploading ? 'Uploading...' : fileUrl ? 'Replace File' : 'Upload PDF'}
+          </Button>
+          <input
+            type="file"
+            accept={field.accept || '*/*'}
+            onChange={(e) => handleFileUpload(e, field.accept || '*/*')}
+            disabled={uploading}
+            style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
+          />
+        </div>
+        {isPdf && (
+          <span style={{ display: 'block', marginTop: 4, fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
+            PDF only · Max 10 MB
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  if (field.type === 'gallery') {
+    const images = Array.isArray(value) ? (value as string[]) : [];
+    return (
+      <div className={styles.formField}>
+        <label className={styles.formLabel}>{field.label}</label>
+        {images.length > 0 && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+            {images.map((url, i) => (
+              <div key={i} style={{ position: 'relative', width: 80, height: 80, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--color-border)' }}>
+                <img src={url} alt={`Gallery ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <button
+                  type="button"
+                  onClick={() => onChange(images.filter((_, idx) => idx !== i))}
+                  style={{
+                    position: 'absolute', top: 2, right: 2, width: 20, height: 20,
+                    borderRadius: '50%', background: 'rgba(0,0,0,0.7)', color: '#fff',
+                    fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    lineHeight: 1,
+                  }}
+                  aria-label="Remove image"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          <Button type="button" variant="secondary" size="sm" disabled={uploadingGallery}>
+            {uploadingGallery ? 'Uploading...' : '+ Add Images'}
+          </Button>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            onChange={handleGalleryUpload}
+            disabled={uploadingGallery}
+            style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
+          />
+        </div>
+        <span style={{ display: 'block', marginTop: 4, fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
+          JPG, PNG, WebP · Max 10 MB each · Multiple allowed
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.formField}>
-      <label className={styles.formLabel}>
-        {field.label}
-        {field.required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
-      </label>
+      <label className={styles.formLabel}>{field.label}</label>
       <input
-        type={field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : field.type === 'url' ? 'url' : 'text'}
+        type="text"
         className={styles.formInput}
         value={String(value ?? '')}
-        onChange={(e) =>
-          onChange(field.type === 'number' ? Number(e.target.value) : e.target.value)
-        }
+        onChange={(e) => onChange(e.target.value)}
         placeholder={field.placeholder}
-        required={field.required}
       />
     </div>
   );

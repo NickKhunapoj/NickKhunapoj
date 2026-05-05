@@ -57,6 +57,7 @@ export interface Certification {
   credential_id: string | null;
   credential_url: string | null;
   description: string | null;
+  gallery_images: string[];
   sort_order: number;
   is_active: boolean;
   created_at: string;
@@ -71,6 +72,7 @@ export interface Project {
   project_url: string | null;
   github_url: string | null;
   image_url: string | null;
+  gallery_images: string[];
   highlights: string[];
   sort_order: number;
   is_active: boolean;
@@ -90,19 +92,6 @@ export interface Skill {
   updated_at: string;
 }
 
-export interface Course {
-  id: string;
-  name: string;
-  provider: string | null;
-  completion_date: string | null;
-  description: string | null;
-  certificate_url: string | null;
-  sort_order: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface Award {
   id: string;
   title: string;
@@ -110,6 +99,7 @@ export interface Award {
   award_date: string | null;
   description: string | null;
   url: string | null;
+  gallery_images: string[];
   sort_order: number;
   is_active: boolean;
   created_at: string;
@@ -130,7 +120,7 @@ export interface TestScore {
   updated_at: string;
 }
 
-// Table name to type mapping
+// Table name to type mapping (courses removed — table left in DB but unused)
 export type TableName =
   | 'profiles'
   | 'education'
@@ -138,7 +128,6 @@ export type TableName =
   | 'certifications'
   | 'projects'
   | 'skills'
-  | 'courses'
   | 'awards'
   | 'test_scores';
 
@@ -153,9 +142,10 @@ export interface CategoryConfig {
 export interface FieldConfig {
   name: string;
   label: string;
-  type: 'text' | 'textarea' | 'date' | 'number' | 'url' | 'toggle' | 'json-array' | 'image';
+  type: 'text' | 'textarea' | 'date' | 'number' | 'url' | 'toggle' | 'json-array' | 'image' | 'file' | 'gallery';
   required?: boolean;
   placeholder?: string;
+  accept?: string;
 }
 
 // Sidebar group for admin navigation

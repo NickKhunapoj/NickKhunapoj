@@ -1,0 +1,239 @@
+/* ============================================
+   MiniDashboard — compact highlight strip
+   ============================================ */
+
+.wrapper {
+  padding: var(--space-xl) 0 var(--space-2xl);
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding-left: var(--space-lg);
+  padding-right: var(--space-lg);
+}
+
+/* ── 3-column responsive grid ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+}
+
+/* ── Base card ── */
+.card {
+  position: relative;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  overflow: hidden;
+  cursor: default;
+  /* subtle inner glow on hover handled by ::before */
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    400px circle at 50% 0%,
+    rgba(41, 151, 255, 0.07),
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  pointer-events: none;
+}
+
+.card:hover {
+  border-color: var(--color-border-hover);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+/* ── Icon row ── */
+.cardIconRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: var(--space-md);
+}
+
+.cardLabel {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+}
+
+/* ── Icon bubble ── */
+.iconBubble {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.iconBubbleBlue {
+  background: rgba(41, 151, 255, 0.12);
+  color: #2997ff;
+  box-shadow: 0 0 12px rgba(41, 151, 255, 0.2);
+}
+
+.iconBubblePurple {
+  background: rgba(160, 100, 255, 0.12);
+  color: #a064ff;
+  box-shadow: 0 0 12px rgba(160, 100, 255, 0.2);
+}
+
+.iconBubbleGold {
+  background: rgba(255, 195, 50, 0.12);
+  color: #ffbb33;
+  box-shadow: 0 0 12px rgba(255, 195, 50, 0.15);
+}
+
+/* ── Card text ── */
+.cardValue {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-xs);
+  line-height: 1.3;
+}
+
+.cardDesc {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.65;
+  margin-bottom: var(--space-md);
+}
+
+/* ── Tag pills ── */
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: var(--space-md);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.tagBlue {
+  background: rgba(41, 151, 255, 0.1);
+  color: #2997ff;
+  border: 1px solid rgba(41, 151, 255, 0.2);
+}
+
+.tagGold {
+  background: rgba(255, 195, 50, 0.1);
+  color: #ffbb33;
+  border: 1px solid rgba(255, 195, 50, 0.2);
+}
+
+/* ── GitHub stat pills ── */
+.githubStatRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-md);
+}
+
+.statPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(160, 100, 255, 0.08);
+  border: 1px solid rgba(160, 100, 255, 0.18);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  color: #a064ff;
+}
+
+.statIcon {
+  font-size: 12px;
+}
+
+.statText {
+  font-size: 11px;
+}
+
+/* ── GitHub link ── */
+.githubLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: #a064ff;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: opacity var(--transition-fast);
+}
+
+.githubLink:hover {
+  opacity: 1;
+}
+
+.youtubeLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: #ff453a;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: opacity var(--transition-fast);
+}
+
+.youtubeLink:hover {
+  opacity: 1;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .wrapper {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: var(--space-md);
+  }
+}
+
+/* ── Respect reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}

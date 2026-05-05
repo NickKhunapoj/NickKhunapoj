@@ -7,10 +7,11 @@ import ExperienceSection from '@/components/sections/ExperienceSection';
 import CertificationSection from '@/components/sections/CertificationSection';
 import ProjectSection from '@/components/sections/ProjectSection';
 import SkillSection from '@/components/sections/SkillSection';
-import CourseSection from '@/components/sections/CourseSection';
 import AwardSection from '@/components/sections/AwardSection';
 import TestScoreSection from '@/components/sections/TestScoreSection';
 import Footer from '@/components/sections/Footer';
+import ScrollReveal from '@/components/ui/ScrollReveal';
+import styles from './page.module.css';
 
 async function getData(table: string) {
   try {
@@ -41,9 +42,7 @@ async function getProfile() {
       .limit(1)
       .single();
 
-    if (error) {
-      return null;
-    }
+    if (error) return null;
     return data;
   } catch {
     return null;
@@ -58,7 +57,6 @@ export default async function Home() {
     certifications,
     projects,
     skills,
-    courses,
     awards,
     testScores,
   ] = await Promise.all([
@@ -68,7 +66,6 @@ export default async function Home() {
     getData('certifications'),
     getData('projects'),
     getData('skills'),
-    getData('courses'),
     getData('awards'),
     getData('test_scores'),
   ]);
@@ -77,31 +74,42 @@ export default async function Home() {
     <>
       <Navbar />
       <Hero profile={profile} />
-      <main>
-        {/* GROUP 1: About */}
-        <div id="about" style={{ paddingTop: 'var(--nav-height)' }}>
-          <ProfileSection profile={profile} />
-          <EducationSection data={education} />
-          <ExperienceSection data={experiences} />
+      <main id="about" className={styles.main}>
+
+        {/* ── Profile ── */}
+        <ProfileSection profile={profile} />
+
+        {/* ── Education + Experience two-column row ── */}
+        <ScrollReveal>
+          <div className={styles.eduExpRow}>
+            <EducationSection data={education} />
+            <ExperienceSection data={experiences} />
+          </div>
+        </ScrollReveal>
+
+        {/* ── Projects carousel ── */}
+        <div className={styles.carouselSection}>
           <ProjectSection data={projects} />
-          <SkillSection data={skills} />
-          <CourseSection data={courses} />
-          <TestScoreSection data={testScores} />
         </div>
+
+        {/* ── Skills ── */}
+        <SkillSection data={skills} />
+
+        {/* ── Test Scores ── */}
+        <TestScoreSection data={testScores} />
 
         <div className="section-divider" />
 
-        {/* GROUP 2: Awards */}
-        <div id="awards" style={{ paddingTop: 'var(--nav-height)' }}>
+        {/* ── Awards carousel ── */}
+        <div className={styles.carouselSection}>
           <AwardSection data={awards} />
         </div>
 
         <div className="section-divider" />
 
-        {/* GROUP 3: Certifications */}
-        <div id="certifications" style={{ paddingTop: 'var(--nav-height)' }}>
-          <CertificationSection data={certifications} />
-        </div>
+        {/* ── Certifications ── */}
+        <CertificationSection data={certifications} />
+
       </main>
       <Footer />
     </>

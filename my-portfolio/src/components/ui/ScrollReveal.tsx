@@ -2,6 +2,7 @@
 
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
+import { useMotion } from './MotionProvider';
 
 interface ScrollRevealProps {
   children: React.ReactNode;
@@ -30,7 +31,23 @@ export default function ScrollReveal({
 }: ScrollRevealProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once, margin: '-60px' });
+  const { reducedMotion } = useMotion();
   const offset = directionMap[direction];
+
+  // Reduced motion: simple fade only
+  if (reducedMotion) {
+    return (
+      <motion.div
+        ref={ref}
+        initial={{ opacity: 0 }}
+        animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.15 }}
+        className={className}
+      >
+        {children}
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

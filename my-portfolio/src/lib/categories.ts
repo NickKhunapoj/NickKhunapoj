@@ -16,7 +16,7 @@ const profileCategory: CategoryConfig = {
     { name: 'github_url', label: 'GitHub URL', type: 'url' },
     { name: 'linkedin_url', label: 'LinkedIn URL', type: 'url' },
     { name: 'profile_image_url', label: 'Profile Image', type: 'image' },
-    { name: 'resume_url', label: 'Resume URL', type: 'url' },
+    { name: 'resume_url', label: 'Resume PDF', type: 'file', accept: 'application/pdf' },
     { name: 'is_active', label: 'Active', type: 'toggle' },
   ],
 };
@@ -65,7 +65,8 @@ const projectsCategory: CategoryConfig = {
     { name: 'tech_stack', label: 'Tech Stack', type: 'json-array', placeholder: 'One technology per line' },
     { name: 'project_url', label: 'Project URL', type: 'url' },
     { name: 'github_url', label: 'GitHub URL', type: 'url' },
-    { name: 'image_url', label: 'Project Image', type: 'image' },
+    { name: 'image_url', label: 'Cover Image', type: 'image' },
+    { name: 'gallery_images', label: 'Gallery Images', type: 'gallery' },
     { name: 'highlights', label: 'Highlights', type: 'json-array', placeholder: 'One highlight per line' },
     { name: 'sort_order', label: 'Sort Order', type: 'number' },
     { name: 'is_active', label: 'Active', type: 'toggle' },
@@ -77,25 +78,10 @@ const skillsCategory: CategoryConfig = {
   label: 'Skills',
   icon: '⚡',
   fields: [
-    { name: 'name', label: 'Name', type: 'text', required: true, placeholder: 'e.g., TypeScript' },
-    { name: 'category', label: 'Category', type: 'text', placeholder: 'e.g., Frontend, Backend, Tools' },
+    { name: 'category', label: 'Category', type: 'text', required: true, placeholder: 'e.g., Frontend, Backend, DevOps & Infrastructure' },
+    { name: 'name', label: 'Skills (one per line)', type: 'textarea', placeholder: 'React & Next.js Web Apps\nSystem Architecture & Design\nUI/UX & User Experience' },
+    { name: 'icon', label: 'Icon', type: 'text', placeholder: 'e.g., <> or 🌐 (emoji/symbol for card header)' },
     { name: 'level', label: 'Level', type: 'text', placeholder: 'e.g., Advanced, Intermediate' },
-    { name: 'icon', label: 'Icon', type: 'text', placeholder: 'e.g., emoji or icon name' },
-    { name: 'sort_order', label: 'Sort Order', type: 'number' },
-    { name: 'is_active', label: 'Active', type: 'toggle' },
-  ],
-};
-
-const coursesCategory: CategoryConfig = {
-  key: 'courses',
-  label: 'Courses',
-  icon: '📚',
-  fields: [
-    { name: 'name', label: 'Name', type: 'text', required: true, placeholder: 'e.g., Machine Learning' },
-    { name: 'provider', label: 'Provider', type: 'text', placeholder: 'e.g., Coursera, Udemy' },
-    { name: 'completion_date', label: 'Completion Date', type: 'date' },
-    { name: 'description', label: 'Description', type: 'textarea' },
-    { name: 'certificate_url', label: 'Certificate URL', type: 'url' },
     { name: 'sort_order', label: 'Sort Order', type: 'number' },
     { name: 'is_active', label: 'Active', type: 'toggle' },
   ],
@@ -127,6 +113,7 @@ const awardsCategory: CategoryConfig = {
     { name: 'award_date', label: 'Award Date', type: 'date' },
     { name: 'description', label: 'Description', type: 'textarea' },
     { name: 'url', label: 'URL', type: 'url' },
+    { name: 'gallery_images', label: 'Activity Pictures', type: 'gallery' },
     { name: 'sort_order', label: 'Sort Order', type: 'number' },
     { name: 'is_active', label: 'Active', type: 'toggle' },
   ],
@@ -144,12 +131,13 @@ const certificationsCategory: CategoryConfig = {
     { name: 'credential_id', label: 'Credential ID', type: 'text' },
     { name: 'credential_url', label: 'Credential URL', type: 'url' },
     { name: 'description', label: 'Description', type: 'textarea' },
+    { name: 'gallery_images', label: 'Activity Pictures', type: 'gallery' },
     { name: 'sort_order', label: 'Sort Order', type: 'number' },
     { name: 'is_active', label: 'Active', type: 'toggle' },
   ],
 };
 
-// Grouped sidebar for admin navigation
+// Grouped sidebar for admin navigation (courses removed)
 export const sidebarGroups: SidebarGroup[] = [
   {
     label: 'About',
@@ -159,7 +147,6 @@ export const sidebarGroups: SidebarGroup[] = [
       experiencesCategory,
       projectsCategory,
       skillsCategory,
-      coursesCategory,
       testScoresCategory,
     ],
   },

@@ -349,7 +349,7 @@ ul, ol {
 .toast-info { border-left: 3px solid var(--color-accent); }
 
 /* ============================================
-   Reduced motion
+   Reduced motion — system preference
    ============================================ */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -363,6 +363,21 @@ ul, ol {
   html {
     scroll-behavior: auto;
   }
+}
+
+/* ============================================
+   Reduced motion — manual toggle via data attr
+   ============================================ */
+html[data-reduced-motion="true"] *,
+html[data-reduced-motion="true"] *::before,
+html[data-reduced-motion="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.15s !important;
+}
+
+html[data-reduced-motion="true"] {
+  scroll-behavior: auto;
 }
 
 /* ============================================

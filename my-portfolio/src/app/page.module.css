@@ -1,0 +1,55 @@
+/* ── Main page layout ── */
+.main {
+  padding-top: var(--nav-height);
+}
+
+/* ── Education + Experience two-column row ── */
+.eduExpRow {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-lg) 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+/* ── Carousel section wrapper ── */
+/* Intentionally full-bleed; internal header is constrained */
+.carouselSection {
+  margin-top: var(--space-4xl);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .eduExpRow {
+    padding: var(--space-2xl) var(--space-lg) 0;
+    gap: var(--space-md);
+  }
+
+  .carouselSection {
+    margin-top: var(--space-3xl);
+  }
+}
+
+@media (max-width: 768px) {
+  .eduExpRow {
+    grid-template-columns: 1fr;
+    padding: var(--space-2xl) var(--space-md) 0;
+  }
+
+  .carouselSection {
+    margin-top: var(--space-2xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .eduExpRow {
+    padding: var(--space-xl) var(--space-md) 0;
+    gap: var(--space-sm);
+  }
+
+  .carouselSection {
+    margin-top: var(--space-xl);
+  }
+}
