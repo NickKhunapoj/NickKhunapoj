@@ -40,25 +40,32 @@ export default function HorizontalShowcase({
   const [modal, setModal] = useState<DetailModalData | null>(null);
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
+  const centerCard = useCallback((index: number, behavior: ScrollBehavior = 'smooth') => {
+    const el = trackRef.current;
+    if (!el || items.length === 0) return;
+
+    const targetIndex = Math.max(0, Math.min(index, items.length - 1));
+    const targetCard = el.children[targetIndex] as HTMLElement | undefined;
+    if (!targetCard) return;
+
+    const centerOffset = (el.clientWidth - targetCard.offsetWidth) / 2;
+    el.scrollTo({
+      left: targetCard.offsetLeft - centerOffset,
+      behavior,
+    });
+    setActiveIndex(targetIndex);
+  }, [items.length]);
+
   // Initialize scroll position with the first item centered.
   useLayoutEffect(() => {
     if (!trackRef.current || items.length === 0) return;
     const el = trackRef.current;
-    const targetCard = el.children[0] as HTMLElement;
-    
-    if (targetCard) {
-      // Temporarily disable snapping to avoid jumping
-      el.style.scrollSnapType = 'none';
-      // Center the card in the track
-      const centerOffset = (el.clientWidth - targetCard.offsetWidth) / 2;
-      el.scrollLeft = targetCard.offsetLeft - centerOffset;
-      // Re-enable snapping
-      requestAnimationFrame(() => {
-        el.style.scrollSnapType = 'x mandatory';
-      });
-      setActiveIndex(0);
-    }
-  }, [items.length]);
+    el.style.scrollSnapType = 'none';
+    centerCard(0, 'auto');
+    requestAnimationFrame(() => {
+      el.style.scrollSnapType = 'x mandatory';
+    });
+  }, [centerCard, items.length]);
 
   // Handle intersection observer to set active item
   useEffect(() => {
@@ -91,17 +98,12 @@ export default function HorizontalShowcase({
   }, [items.length]);
 
   const scrollLeft = useCallback(() => {
-    if (trackRef.current) {
-      // scroll by roughly one card width; native snapping will correct it to the exact card
-      trackRef.current.scrollBy({ left: -320, behavior: 'smooth' });
-    }
-  }, []);
+    centerCard(activeIndex - 1);
+  }, [activeIndex, centerCard]);
 
   const scrollRight = useCallback(() => {
-    if (trackRef.current) {
-      trackRef.current.scrollBy({ left: 320, behavior: 'smooth' });
-    }
-  }, []);
+    centerCard(activeIndex + 1);
+  }, [activeIndex, centerCard]);
 
   if (items.length === 0) {
     return (
@@ -150,15 +152,7 @@ export default function HorizontalShowcase({
                   // Only allow opening if it is the currently active (centered) item
                   if (!isActive) {
                     // If they click an inactive item, scroll it to the center instead
-                    const cardNodes = trackRef.current?.querySelectorAll(`.${styles.card}`);
-                    const targetNode = cardNodes?.[index] as HTMLElement;
-                    if (trackRef.current && targetNode) {
-                      const centerOffset = (trackRef.current.clientWidth - targetNode.offsetWidth) / 2;
-                      trackRef.current.scrollTo({
-                        left: targetNode.offsetLeft - centerOffset,
-                        behavior: 'smooth'
-                      });
-                    }
+                    centerCard(index);
                     return;
                   }
 
@@ -175,10 +169,20 @@ export default function HorizontalShowcase({
 
         {/* Center Bottom Navigation */}
         <div className={styles.navContainer}>
-          <button className={styles.navBtn} onClick={scrollLeft} aria-label="Scroll left">
+          <button
+            className={styles.navBtn}
+            onClick={scrollLeft}
+            aria-label="Scroll left"
+            disabled={activeIndex === 0}
+          >
             &larr;
           </button>
-          <button className={styles.navBtn} onClick={scrollRight} aria-label="Scroll right">
+          <button
+            className={styles.navBtn}
+            onClick={scrollRight}
+            aria-label="Scroll right"
+            disabled={activeIndex === items.length - 1}
+          >
             &rarr;
           </button>
         </div>

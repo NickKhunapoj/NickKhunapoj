@@ -81,6 +81,17 @@
   transform: scale(1.05);
 }
 
+.navBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.navBtn:disabled:hover {
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+}
+
 /* ── Scroll track ── */
 .track {
   display: flex;
