@@ -147,7 +147,6 @@ export default function Hero({ profile }: HeroProps) {
 
       <div className={styles.scrollIndicator}>
         <div className={styles.scrollLine} />
-        <span className={styles.scrollLabel}>Scroll</span>
       </div>
     </section>
   );

@@ -202,24 +202,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .scrollLine {
   width: 2px;
-  height: 44px;
+  height: 40px;
   border-radius: var(--radius-full);
-  background: linear-gradient(to bottom, rgba(41, 151, 255, 0.95), rgba(245, 245, 247, 0.15));
+  background: linear-gradient(to bottom, rgba(41, 151, 255, 0.95), transparent);
   box-shadow: 0 0 18px rgba(41, 151, 255, 0.35);
   animation: pulse-line 2s ease-in-out infinite;
-}
-
-.scrollLabel {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-text-tertiary);
 }
 
 @keyframes pulse-line {
@@ -242,24 +234,14 @@
 
   .scrollIndicator {
     bottom: var(--space-lg);
-    padding: 10px 12px;
-    border-radius: var(--radius-full);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
   }
 
   .scrollLine {
-    height: 52px;
+    height: 44px;
     width: 3px;
-    background: linear-gradient(to bottom, #2997ff, rgba(255, 255, 255, 0.35));
+    background: linear-gradient(to bottom, #2997ff, transparent);
     box-shadow:
       0 0 16px rgba(41, 151, 255, 0.55),
       0 0 32px rgba(41, 151, 255, 0.28);
-  }
-
-  .scrollLabel {
-    color: var(--color-text-secondary);
   }
 }
