@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Manrope, Kanit } from 'next/font/google';
+import { MotionProvider } from '@/components/ui/MotionProvider';
 import './globals.css';
 
 const manrope = Manrope({
@@ -36,7 +37,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${manrope.variable} ${kanit.variable}`}>
-      <body>{children}</body>
+      <body>
+        <MotionProvider>{children}</MotionProvider>
+      </body>
     </html>
   );
 }

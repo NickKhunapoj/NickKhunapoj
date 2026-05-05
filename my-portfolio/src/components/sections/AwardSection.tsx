@@ -1,53 +1,50 @@
-import Section from '@/components/ui/Section';
-import Card from '@/components/ui/Card';
-import EmptyState from '@/components/ui/EmptyState';
 import ScrollReveal from '@/components/ui/ScrollReveal';
+import HorizontalShowcase, { ShowcaseCardData } from '@/components/ui/HorizontalShowcase';
 import { Award } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
-import styles from './ContentStyles.module.css';
 
 interface Props {
   data: Award[];
 }
 
 export default function AwardSection({ data }: Props) {
+  const items: ShowcaseCardData[] = data.map((item) => {
+    const gallery = Array.isArray(item.gallery_images) ? item.gallery_images : [];
+
+    const links = [];
+    if (item.url) links.push({ label: 'View Award', href: item.url, primary: true });
+
+    return {
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      date: formatDate(item.award_date),
+      icon: '🏆',
+      imageUrl: gallery.length > 0 ? gallery[0] : null,
+      tags: item.issuer ? [item.issuer] : [],
+      href: item.url,
+      modalData: {
+        icon: '🏆',
+        title: item.title,
+        date: formatDate(item.award_date),
+        description: item.description,
+        tags: item.issuer ? [item.issuer] : [],
+        images: gallery,
+        links,
+      },
+    };
+  });
+
   return (
     <ScrollReveal>
-      <Section id="awards" title="Honors & Awards" subtitle="Recognitions and achievements">
-        {data.length === 0 ? (
-          <EmptyState icon="🏆" message="No awards listed yet." />
-        ) : (
-          <div className={`${styles.grid} ${styles.grid2}`}>
-            {data.map((item) => {
-              const gallery = Array.isArray(item.gallery_images) ? item.gallery_images : [];
-              return (
-                <Card
-                  key={item.id}
-                  title={item.title}
-                  subtitle={item.issuer || undefined}
-                  meta={formatDate(item.award_date)}
-                  href={item.url || undefined}
-                >
-                  {item.description && <p>{item.description}</p>}
-                  {gallery.length > 0 && (
-                    <div className={styles.galleryGrid}>
-                      {gallery.map((url, i) => (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          key={i}
-                          src={url}
-                          alt={`${item.title} photo ${i + 1}`}
-                          className={styles.galleryImg}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </Card>
-              );
-            })}
-          </div>
-        )}
-      </Section>
+      <HorizontalShowcase
+        id="awards"
+        title="Honors & Awards"
+        subtitle="Recognitions and achievements"
+        items={items}
+        emptyIcon="🏆"
+        emptyMessage="No awards listed yet."
+      />
     </ScrollReveal>
   );
 }

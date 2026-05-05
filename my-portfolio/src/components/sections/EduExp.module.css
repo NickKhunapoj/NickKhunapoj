@@ -1,0 +1,155 @@
+/* ============================================
+   Education / Experience Panel Wrapper
+   ============================================ */
+
+/* Outer container — lives inside the page's max-width container */
+.eduExpBlock {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-xl) 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+/* Each panel (Education or Experience) */
+.panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  transition: border-color var(--transition-base), background var(--transition-base);
+  min-width: 0; /* prevent grid blowout */
+}
+
+.panel:hover {
+  border-color: var(--color-border-hover);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Panel header */
+.panelTitle {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.panelSubtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-lg);
+  font-weight: 400;
+}
+
+/* Entry cards inside the panel */
+.entryList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.entry {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  min-width: 0;
+}
+
+.entryHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.entryTitle {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.35;
+  min-width: 0;
+}
+
+.entryMeta {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.entrySubtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-xs);
+}
+
+.entryLocation {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-sm);
+}
+
+.entryDesc {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.65;
+  margin-top: var(--space-xs);
+}
+
+.highlights {
+  margin-top: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.highlight {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+  padding-left: var(--space-md);
+  position: relative;
+}
+
+.highlight::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--color-accent);
+  font-size: var(--text-xs);
+  top: 2px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .eduExpBlock {
+    padding: var(--space-2xl) var(--space-lg) 0;
+    gap: var(--space-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .eduExpBlock {
+    grid-template-columns: 1fr;
+    padding: var(--space-2xl) var(--space-md) 0;
+  }
+
+  .panel {
+    padding: var(--space-lg);
+  }
+
+  .entry {
+    padding: var(--space-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .eduExpBlock {
+    padding: var(--space-xl) var(--space-md) 0;
+  }
+}

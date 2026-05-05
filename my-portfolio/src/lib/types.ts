@@ -92,19 +92,6 @@ export interface Skill {
   updated_at: string;
 }
 
-export interface Course {
-  id: string;
-  name: string;
-  provider: string | null;
-  completion_date: string | null;
-  description: string | null;
-  certificate_url: string | null;
-  sort_order: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface Award {
   id: string;
   title: string;
@@ -133,7 +120,7 @@ export interface TestScore {
   updated_at: string;
 }
 
-// Table name to type mapping
+// Table name to type mapping (courses removed — table left in DB but unused)
 export type TableName =
   | 'profiles'
   | 'education'
@@ -141,7 +128,6 @@ export type TableName =
   | 'certifications'
   | 'projects'
   | 'skills'
-  | 'courses'
   | 'awards'
   | 'test_scores';
 

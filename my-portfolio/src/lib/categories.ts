@@ -87,21 +87,6 @@ const skillsCategory: CategoryConfig = {
   ],
 };
 
-const coursesCategory: CategoryConfig = {
-  key: 'courses',
-  label: 'Courses',
-  icon: '📚',
-  fields: [
-    { name: 'name', label: 'Name', type: 'text', required: true, placeholder: 'e.g., Machine Learning' },
-    { name: 'provider', label: 'Provider', type: 'text', placeholder: 'e.g., Coursera, Udemy' },
-    { name: 'completion_date', label: 'Completion Date', type: 'date' },
-    { name: 'description', label: 'Description', type: 'textarea' },
-    { name: 'certificate_url', label: 'Certificate URL', type: 'url' },
-    { name: 'sort_order', label: 'Sort Order', type: 'number' },
-    { name: 'is_active', label: 'Active', type: 'toggle' },
-  ],
-};
-
 const testScoresCategory: CategoryConfig = {
   key: 'test_scores',
   label: 'Test Scores',
@@ -152,7 +137,7 @@ const certificationsCategory: CategoryConfig = {
   ],
 };
 
-// Grouped sidebar for admin navigation
+// Grouped sidebar for admin navigation (courses removed)
 export const sidebarGroups: SidebarGroup[] = [
   {
     label: 'About',
@@ -162,7 +147,6 @@ export const sidebarGroups: SidebarGroup[] = [
       experiencesCategory,
       projectsCategory,
       skillsCategory,
-      coursesCategory,
       testScoresCategory,
     ],
   },

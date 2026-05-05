@@ -40,7 +40,8 @@
   opacity: 0.7;
 }
 
-.links {
+/* ── Desktop links ── */
+.desktopLinks {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
@@ -78,63 +79,186 @@
   background: var(--color-accent);
 }
 
-.adminLink {
-  padding: 8px 16px;
-  font-size: var(--text-xs);
-  font-weight: 600;
-  color: var(--color-accent);
-  border: 1px solid rgba(41, 151, 255, 0.2);
+/* ── Reduced-motion toggle (desktop) ── */
+.motionToggle {
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-full);
-  transition: all var(--transition-fast);
-  margin-left: var(--space-sm);
-}
-
-.adminLink:hover {
-  background: var(--color-accent-soft);
-}
-
-/* Mobile */
-.mobileBtn {
-  display: none;
-  width: 36px;
-  height: 36px;
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-md);
-  font-size: var(--text-lg);
+  margin-left: var(--space-sm);
+  transition: color var(--transition-fast), background var(--transition-fast);
 }
 
+.motionToggle:hover {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Hamburger ── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  gap: 5px;
+  z-index: 1100;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.hamburger:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.hamburgerLine {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--color-text-primary);
+  border-radius: 2px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.2s ease;
+  transform-origin: center;
+}
+
+/* Hamburger → X morph */
+.hamburgerOpen .hamburgerLine:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.hamburgerOpen .hamburgerLine:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburgerOpen .hamburgerLine:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ── Backdrop ── */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ── Drawer ── */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(320px, 85vw);
+  z-index: 1060;
+  background: rgba(10, 10, 10, 0.92);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2xl) var(--space-lg) var(--space-lg);
+}
+
+.drawerClose {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-lg);
+  color: var(--color-text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.drawerClose:hover {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.drawerNav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-top: var(--space-xl);
+}
+
+.drawerLink {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-lg);
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.drawerLink:hover {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.drawerLinkActive {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.drawerDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  margin-left: auto;
+}
+
+/* Drawer footer */
+.drawerFooter {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-md);
+}
+
+.drawerMotionToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  border-radius: var(--radius-md);
+  transition: color var(--transition-fast), background var(--transition-fast);
+  text-align: left;
+}
+
+.drawerMotionToggle:hover {
+  color: var(--color-text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ── Mobile responsive ── */
 @media (max-width: 768px) {
-  .links {
+  .desktopLinks {
     display: none;
   }
 
-  .mobileBtn {
+  .hamburger {
     display: flex;
-  }
-
-  .linksOpen {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    top: var(--nav-height);
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.92);
-    backdrop-filter: blur(20px);
-    padding: var(--space-md);
-    border-bottom: 1px solid var(--color-border);
-    animation: fadeIn 0.2s ease-out;
-  }
-
-  .linksOpen .link {
-    padding: var(--space-md);
-    border-radius: var(--radius-md);
-  }
-
-  .linksOpen .adminLink {
-    margin-left: 0;
-    margin-top: var(--space-sm);
-    text-align: center;
   }
 }

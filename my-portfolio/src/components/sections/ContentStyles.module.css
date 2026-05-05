@@ -17,6 +17,20 @@
   gap: var(--space-md);
 }
 
+/* ── Section panel — glass container for Education/Experience ── */
+.sectionPanel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  transition: border-color var(--transition-base), background var(--transition-base);
+}
+
+.sectionPanel:hover {
+  border-color: var(--color-border-hover);
+  background: rgba(255, 255, 255, 0.04);
+}
+
 .highlights {
   margin-top: var(--space-sm);
   padding-left: var(--space-md);
