@@ -34,8 +34,8 @@ export default function Hero({ profile }: HeroProps) {
   const name = profile?.full_name || 'Khunapoj Suttenon';
   const headline = profile?.headline || 'Computer Engineering · Web Developer';
   const bio =
-    profile?.short_bio ||
-    'Passionate about building elegant, performant digital experiences. Currently studying Computer Engineering at KMUTNB, Bangkok, Thailand.';
+    profile?.hero_intro ||
+    'Welcome to my digital portfolio. Explore the projects, skills, and experiences that shape how I build thoughtful web systems and keep learning as a Computer Engineering student.';
   const email = profile?.email || 'Khunapoj.s@gmail.com';
   const github = profile?.github_url || 'https://github.com/NickKhunapoj';
   const linkedin =

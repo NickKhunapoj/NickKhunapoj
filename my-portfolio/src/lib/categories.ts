@@ -8,6 +8,7 @@ const profileCategory: CategoryConfig = {
   fields: [
     { name: 'full_name', label: 'Full Name', type: 'text', required: true, placeholder: 'e.g., Khunapoj Suttenon' },
     { name: 'headline', label: 'Headline', type: 'text', placeholder: 'e.g., Computer Engineering · Web Developer' },
+    { name: 'hero_intro', label: 'Hero Intro', type: 'textarea', placeholder: 'Invite visitors to explore your portfolio...' },
     { name: 'short_bio', label: 'Short Bio', type: 'textarea', placeholder: 'Write a brief bio...' },
     { name: 'location', label: 'Location', type: 'text', placeholder: 'e.g., Bangkok, Thailand' },
     { name: 'email', label: 'Email', type: 'text', placeholder: 'your@email.com' },

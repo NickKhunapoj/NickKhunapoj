@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   full_name TEXT NOT NULL,
   headline TEXT,
+  hero_intro TEXT,
   short_bio TEXT,
   location TEXT,
   email TEXT,
