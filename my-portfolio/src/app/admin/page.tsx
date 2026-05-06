@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { sidebarGroups, categories } from '@/lib/categories';
-import { TableName, FieldConfig, CategoryConfig } from '@/lib/types';
+import { TableName, FieldConfig } from '@/lib/types';
 import { formatFullDate } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import Skeleton from '@/components/ui/Skeleton';
@@ -67,7 +68,9 @@ export default function AdminDashboard() {
   }, [activeCategory, supabase, addToast]);
 
   useEffect(() => {
-    fetchItems();
+    queueMicrotask(() => {
+      void fetchItems();
+    });
   }, [fetchItems]);
 
   const handleLogout = async () => {
@@ -124,8 +127,9 @@ export default function AdminDashboard() {
       }
       setModalOpen(false);
       fetchItems();
-    } catch (err: any) {
-      addToast(`Error: ${err.message}`, 'error');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      addToast(`Error: ${message}`, 'error');
     } finally {
       setSaving(false);
     }
@@ -246,10 +250,10 @@ export default function AdminDashboard() {
           ))}
         </nav>
         <div className={styles.sidebarFooter}>
-          <a href="/" className={styles.navItem} style={{ marginBottom: 8 }}>
+          <Link href="/" className={styles.navItem} style={{ marginBottom: 8 }}>
             <span className={styles.navIcon}>🌐</span>
             View Site
-          </a>
+          </Link>
           <button className={styles.logoutBtn} onClick={handleLogout}>
             <span className={styles.navIcon}>🚪</span>
             Sign Out
@@ -495,15 +499,58 @@ function FormField({
     }
 
     setUploading(true);
-    const { uploadFile } = await import('@/lib/supabase/storage');
-    const url = await uploadFile(file);
-    if (url) {
-      onChange(url);
-    } else {
-      alert('Failed to upload file.');
+    try {
+      let url: string | null = null;
+
+      if (field.name === 'resume_url' && acceptType === 'application/pdf') {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/api/resume', {
+          method: 'PUT',
+          body: formData,
+        });
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(payload.error || 'Failed to upload resume.');
+        }
+
+        url = payload.url;
+      } else {
+        const { uploadFile } = await import('@/lib/supabase/storage');
+        url = await uploadFile(file);
+      }
+
+      if (url) {
+        onChange(url);
+      } else {
+        alert('Failed to upload file.');
+      }
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to upload file.');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
     }
-    setUploading(false);
-    e.target.value = '';
+  };
+
+  const handleResumeRemove = async () => {
+    setUploading(true);
+    try {
+      const response = await fetch('/api/resume', { method: 'DELETE' });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.error || 'Failed to delete resume.');
+      }
+
+      onChange('');
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to delete resume.');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -604,6 +651,7 @@ function FormField({
     const fileUrl = typeof value === 'string' ? value : '';
     const isPdf = field.accept === 'application/pdf';
     const isResume = field.name === 'resume_url';
+    const viewUrl = isResume && fileUrl ? '/resume.pdf' : fileUrl;
     return (
       <div className={styles.formField}>
         <label className={styles.formLabel}>{field.label}</label>
@@ -615,7 +663,7 @@ function FormField({
                 {fileUrl ? 'Resume is ready' : isResume ? 'Upload your resume' : 'Upload file'}
               </span>
               <span className={styles.fileUploadHint}>
-                {isPdf ? 'PDF only, up to 10 MB. This powers the About Me resume button.' : 'Max 10 MB.'}
+                {isResume ? 'PDF only, up to 10 MB. Published from your website at /resume.pdf.' : isPdf ? 'PDF only, up to 10 MB.' : 'Max 10 MB.'}
               </span>
             </div>
           </div>
@@ -623,13 +671,18 @@ function FormField({
           {fileUrl && (
             <div className={styles.fileCurrent}>
               <span className={styles.fileCurrentName}>
-                {isPdf ? 'Current resume PDF' : 'Current file'}
+                {isResume ? '/resume.pdf' : isPdf ? 'Current PDF' : 'Current file'}
             </span>
               <div className={styles.fileActions}>
-                <a href={fileUrl} target="_blank" rel="noopener noreferrer" className={styles.fileActionLink}>
+                <a href={viewUrl} target="_blank" rel="noopener noreferrer" className={styles.fileActionLink}>
                   View ↗
                 </a>
-                <button type="button" onClick={() => onChange('')} className={styles.fileRemoveBtn}>
+                <button
+                  type="button"
+                  onClick={isResume ? handleResumeRemove : () => onChange('')}
+                  className={styles.fileRemoveBtn}
+                  disabled={uploading}
+                >
                   Remove
                 </button>
               </div>

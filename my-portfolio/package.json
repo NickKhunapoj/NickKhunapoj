@@ -1,12 +1,15 @@
 {
   "name": "my-portfolio",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "release": "standard-version",
+    "release:dry-run": "standard-version --dry-run",
+    "release:first": "standard-version --first-release"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -28,6 +31,7 @@
     "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
+    "standard-version": "^9.5.0",
     "tsx": "^4.21.0",
     "typescript": "^5"
   }

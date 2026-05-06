@@ -75,7 +75,7 @@ export default function ProfileSection({ profile }: { profile: Profile | null })
               {/* Resume button */}
               {profile.resume_url && (
                 <a
-                  href={profile.resume_url}
+                  href="/resume.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={styles.resumeCard}

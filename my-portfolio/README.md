@@ -54,6 +54,17 @@ npm run dev
 Visit `http://localhost:3000` to see the public site.
 Visit `http://localhost:3000/admin` to access the admin dashboard.
 
+## Releases
+
+This project uses `standard-version` for semantic version bumps, changelog generation, release commits, and tags. Write commits with Conventional Commit prefixes such as `feat:`, `fix:`, `docs:`, or `chore:`.
+
+```bash
+npm run release:dry-run
+npm run release
+```
+
+The current migration baseline is `1.1.0`. After this migration is committed, run `npm run release:first` once if you need to create the initial `v1.1.0` release commit and tag. Future releases should use `npm run release`.
+
 ## Tech Stack
 
 - **Framework:** Next.js 16+ (App Router)

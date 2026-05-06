@@ -176,12 +176,19 @@ export default function Navbar() {
 
             {/* Reduced-motion toggle (desktop) */}
             <button
-              className={styles.motionToggle}
+              className={`${styles.motionToggle} ${reducedMotion ? styles.motionToggleActive : ''}`}
               onClick={toggleReducedMotion}
               aria-label={reducedMotion ? 'Enable animations' : 'Reduce motion'}
+              aria-pressed={reducedMotion}
               title={reducedMotion ? 'Enable animations' : 'Reduce motion'}
             >
-              {reducedMotion ? '⏸' : '✦'}
+              <span className={styles.motionIcon} aria-hidden="true">
+                <span />
+                <span />
+              </span>
+              <span className={styles.motionText}>
+                {reducedMotion ? 'Motion off' : 'Reduce motion'}
+              </span>
             </button>
           </div>
 
