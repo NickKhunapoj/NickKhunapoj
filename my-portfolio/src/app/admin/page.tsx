@@ -499,58 +499,15 @@ function FormField({
     }
 
     setUploading(true);
-    try {
-      let url: string | null = null;
-
-      if (field.name === 'resume_url' && acceptType === 'application/pdf') {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await fetch('/api/resume', {
-          method: 'PUT',
-          body: formData,
-        });
-        const payload = await response.json();
-
-        if (!response.ok) {
-          throw new Error(payload.error || 'Failed to upload resume.');
-        }
-
-        url = payload.url;
-      } else {
-        const { uploadFile } = await import('@/lib/supabase/storage');
-        url = await uploadFile(file);
-      }
-
-      if (url) {
-        onChange(url);
-      } else {
-        alert('Failed to upload file.');
-      }
-    } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to upload file.');
-    } finally {
-      setUploading(false);
-      e.target.value = '';
+    const { uploadFile } = await import('@/lib/supabase/storage');
+    const url = await uploadFile(file);
+    if (url) {
+      onChange(url);
+    } else {
+      alert('Failed to upload file.');
     }
-  };
-
-  const handleResumeRemove = async () => {
-    setUploading(true);
-    try {
-      const response = await fetch('/api/resume', { method: 'DELETE' });
-      const payload = await response.json();
-
-      if (!response.ok) {
-        throw new Error(payload.error || 'Failed to delete resume.');
-      }
-
-      onChange('');
-    } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to delete resume.');
-    } finally {
-      setUploading(false);
-    }
+    setUploading(false);
+    e.target.value = '';
   };
 
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -651,7 +608,6 @@ function FormField({
     const fileUrl = typeof value === 'string' ? value : '';
     const isPdf = field.accept === 'application/pdf';
     const isResume = field.name === 'resume_url';
-    const viewUrl = isResume && fileUrl ? '/resume.pdf' : fileUrl;
     return (
       <div className={styles.formField}>
         <label className={styles.formLabel}>{field.label}</label>
@@ -663,7 +619,7 @@ function FormField({
                 {fileUrl ? 'Resume is ready' : isResume ? 'Upload your resume' : 'Upload file'}
               </span>
               <span className={styles.fileUploadHint}>
-                {isResume ? 'PDF only, up to 10 MB. Published from your website at /resume.pdf.' : isPdf ? 'PDF only, up to 10 MB.' : 'Max 10 MB.'}
+                {isPdf ? 'PDF only, up to 10 MB. This powers the About Me resume button.' : 'Max 10 MB.'}
               </span>
             </div>
           </div>
@@ -671,18 +627,13 @@ function FormField({
           {fileUrl && (
             <div className={styles.fileCurrent}>
               <span className={styles.fileCurrentName}>
-                {isResume ? '/resume.pdf' : isPdf ? 'Current PDF' : 'Current file'}
+                {isPdf ? 'Current resume PDF' : 'Current file'}
             </span>
               <div className={styles.fileActions}>
-                <a href={viewUrl} target="_blank" rel="noopener noreferrer" className={styles.fileActionLink}>
+                <a href={fileUrl} target="_blank" rel="noopener noreferrer" className={styles.fileActionLink}>
                   View ↗
                 </a>
-                <button
-                  type="button"
-                  onClick={isResume ? handleResumeRemove : () => onChange('')}
-                  className={styles.fileRemoveBtn}
-                  disabled={uploading}
-                >
+                <button type="button" onClick={() => onChange('')} className={styles.fileRemoveBtn}>
                   Remove
                 </button>
               </div>
