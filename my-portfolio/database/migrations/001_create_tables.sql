@@ -94,6 +94,7 @@ CREATE TABLE IF NOT EXISTS skills (
   category TEXT,
   level TEXT,
   icon TEXT,
+  header_color TEXT,
   sort_order INTEGER DEFAULT 0,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT now(),

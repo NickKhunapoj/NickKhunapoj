@@ -82,6 +82,7 @@ const skillsCategory: CategoryConfig = {
     { name: 'category', label: 'Category', type: 'text', required: true, placeholder: 'e.g., Frontend, Backend, DevOps & Infrastructure' },
     { name: 'name', label: 'Skills (one per line)', type: 'textarea', placeholder: 'React & Next.js Web Apps\nSystem Architecture & Design\nUI/UX & User Experience' },
     { name: 'icon', label: 'Icon', type: 'text', placeholder: 'e.g., <> or 🌐 (emoji/symbol for card header)' },
+    { name: 'header_color', label: 'Header Color', type: 'color', placeholder: '#2997ff' },
     { name: 'level', label: 'Level', type: 'text', placeholder: 'e.g., Advanced, Intermediate' },
     { name: 'sort_order', label: 'Sort Order', type: 'number' },
     { name: 'is_active', label: 'Active', type: 'toggle' },

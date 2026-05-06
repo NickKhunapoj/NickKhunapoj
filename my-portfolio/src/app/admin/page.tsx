@@ -655,6 +655,33 @@ function FormField({
     );
   }
 
+  if (field.type === 'color') {
+    const stringValue = typeof value === 'string' ? value : '';
+    const pickerValue = /^#[\da-f]{6}$/i.test(stringValue) ? stringValue : '#2997ff';
+
+    return (
+      <div className={styles.formField}>
+        <label className={styles.formLabel}>{field.label}</label>
+        <div className={styles.colorField}>
+          <input
+            type="color"
+            className={styles.colorPicker}
+            value={pickerValue}
+            onChange={(e) => onChange(e.target.value)}
+            aria-label={`${field.label} picker`}
+          />
+          <input
+            type="text"
+            className={styles.formInput}
+            value={stringValue}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={field.placeholder || '#2997ff'}
+          />
+        </div>
+      </div>
+    );
+  }
+
   if (field.type === 'gallery') {
     const images = Array.isArray(value) ? (value as string[]) : [];
     return (

@@ -344,6 +344,32 @@
   box-shadow: 0 0 0 2px var(--color-accent-soft);
 }
 
+.colorField {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.colorPicker {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.colorPicker::-webkit-color-swatch-wrapper {
+  padding: 4px;
+}
+
+.colorPicker::-webkit-color-swatch {
+  border: 0;
+  border-radius: calc(var(--radius-md) - 4px);
+}
+
 .formTextarea {
   resize: vertical;
   min-height: 80px;

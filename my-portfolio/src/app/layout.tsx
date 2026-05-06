@@ -17,7 +17,7 @@ const kanit = Kanit({
 });
 
 export const metadata: Metadata = {
-  title: 'Khunapoj Suttenon — Portfolio',
+  title: 'Portfolio | Khunapoj Suttenon',
   description:
     'Computer Engineering student & Web Developer. Explore my projects, skills, certifications, and achievements.',
   keywords: ['portfolio', 'computer engineering', 'web developer', 'Khunapoj Suttenon'],
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     apple: '/nickgogogo-logo-circle.png',
   },
   openGraph: {
-    title: 'Khunapoj Suttenon — Portfolio',
+    title: 'Portfolio | Khunapoj Suttenon',
     description:
       'Computer Engineering student & Web Developer. Explore my projects, skills, certifications, and achievements.',
     type: 'website',

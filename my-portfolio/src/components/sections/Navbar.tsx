@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMotion } from '@/components/ui/MotionProvider';
 import styles from './Navbar.module.css';
@@ -11,10 +11,12 @@ const NAV_ITEMS = [
   { label: 'About', href: '#about' },
   { label: 'Projects', href: '#projects' },
   { label: 'Awards', href: '#awards' },
+  { label: 'Stats', href: '/stats' },
 ];
 
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const { reducedMotion, toggleReducedMotion } = useMotion();
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('');
@@ -29,7 +31,7 @@ export default function Navbar() {
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
-      const sections = NAV_ITEMS.map((item) => item.href.slice(1));
+      const sections = NAV_ITEMS.filter((item) => item.href.startsWith('#')).map((item) => item.href.slice(1));
       let current = '';
       for (const id of sections) {
         const el = document.getElementById(id);
@@ -79,7 +81,11 @@ export default function Navbar() {
   const scrollToSection = useCallback((href: string) => {
     const id = href.slice(1);
     const target = document.getElementById(id);
-    if (!target) return;
+    if (!target) {
+      window.sessionStorage.setItem('pending-scroll-section', id);
+      router.push('/');
+      return;
+    }
 
     target.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' });
     setActiveSection(id);
@@ -87,12 +93,28 @@ export default function Navbar() {
     if (window.location.hash) {
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
     }
-  }, [reducedMotion]);
+  }, [reducedMotion, router]);
+
+  useEffect(() => {
+    if (pathname !== '/') return;
+
+    const pendingSection = window.sessionStorage.getItem('pending-scroll-section');
+    if (!pendingSection) return;
+
+    window.sessionStorage.removeItem('pending-scroll-section');
+    requestAnimationFrame(() => {
+      scrollToSection(`#${pendingSection}`);
+    });
+  }, [pathname, scrollToSection]);
 
   const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    scrollToSection(href);
-  }, [scrollToSection]);
+    if (href.startsWith('#')) {
+      scrollToSection(href);
+    } else {
+      router.push(href);
+    }
+  }, [router, scrollToSection]);
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -108,7 +130,11 @@ export default function Navbar() {
       clickTimeoutRef.current = setTimeout(() => {
         setClickCount(0);
         if (newCount === 1) {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          if (pathname === '/') {
+            window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+          } else {
+            router.push('/');
+          }
         }
       }, 400);
     }
@@ -120,7 +146,7 @@ export default function Navbar() {
     <>
       <nav className={`${styles.nav} ${scrolled ? styles.navScrolled : ''}`}>
         <div className={styles.inner}>
-          <a href="#hero" className={styles.logo} onClick={handleLogoClick}>
+          <a href={pathname === '/' ? '#hero' : '/'} className={styles.logo} onClick={handleLogoClick}>
             <Image
               src="/nickgogogo-logo-circle.png"
               alt="Khunapoj Suttenon"
@@ -139,7 +165,9 @@ export default function Navbar() {
                 href={item.href}
                 onClick={(e) => handleNavClick(e, item.href)}
                 className={`${styles.link} ${
-                  activeSection === item.href.slice(1) ? styles.linkActive : ''
+                  item.href.startsWith('/')
+                    ? pathname === item.href ? styles.linkActive : ''
+                    : activeSection === item.href.slice(1) ? styles.linkActive : ''
                 }`}
               >
                 {item.label}
@@ -217,7 +245,9 @@ export default function Navbar() {
                     key={item.href}
                     href={item.href}
                     className={`${styles.drawerLink} ${
-                      activeSection === item.href.slice(1) ? styles.drawerLinkActive : ''
+                      item.href.startsWith('/')
+                        ? pathname === item.href ? styles.drawerLinkActive : ''
+                        : activeSection === item.href.slice(1) ? styles.drawerLinkActive : ''
                     }`}
                     onClick={(e) => {
                       handleNavClick(e, item.href);
@@ -228,7 +258,7 @@ export default function Navbar() {
                     transition={{ delay: reducedMotion ? 0 : 0.1 + i * 0.06, duration: reducedMotion ? 0 : 0.3 }}
                   >
                     {item.label}
-                    {activeSection === item.href.slice(1) && (
+                    {(item.href.startsWith('/') ? pathname === item.href : activeSection === item.href.slice(1)) && (
                       <span className={styles.drawerDot} />
                     )}
                   </motion.a>

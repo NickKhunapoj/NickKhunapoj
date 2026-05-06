@@ -22,8 +22,33 @@ const categoryAccents: Record<string, { color: string; bg: string; border: strin
 };
 const defaultAccent = { color: '#2997ff', bg: 'rgba(41, 151, 255, 0.10)', border: 'rgba(41, 151, 255, 0.20)' };
 
-function getAccent(category: string) {
-  return categoryAccents[category.toLowerCase()] ?? defaultAccent;
+function hexToRgb(color: string) {
+  const normalized = color.trim().replace('#', '');
+  if (!/^[\da-f]{6}$/i.test(normalized)) return null;
+
+  const value = Number.parseInt(normalized, 16);
+  return {
+    r: (value >> 16) & 255,
+    g: (value >> 8) & 255,
+    b: value & 255,
+  };
+}
+
+function getCustomAccent(color?: string | null) {
+  if (!color) return null;
+  const rgb = hexToRgb(color);
+  if (!rgb) return null;
+
+  const hex = `#${color.trim().replace('#', '')}`;
+  return {
+    color: hex,
+    bg: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.10)`,
+    border: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.22)`,
+  };
+}
+
+function getAccent(category: string, headerColor?: string | null) {
+  return getCustomAccent(headerColor) ?? categoryAccents[category.toLowerCase()] ?? defaultAccent;
 }
 
 /**
@@ -75,19 +100,21 @@ export default function SkillSection({ data }: Props) {
    *  - Old data: many rows per category, each with a single-word name
    *  - New data: one row per category, name is a newline/array of bullets
    */
-  const grouped = new Map<string, { icon: string; bullets: string[] }>();
+  const grouped = new Map<string, { icon: string; bullets: string[]; headerColor: string }>();
 
   for (const skill of data) {
     const cat = skill.category || 'Other';
     const bullets = parseBullets(skill.name);
     const icon = skill.icon || '';
+    const headerColor = skill.header_color || '';
 
     if (!grouped.has(cat)) {
-      grouped.set(cat, { icon, bullets: [] });
+      grouped.set(cat, { icon, bullets: [], headerColor });
     }
     const entry = grouped.get(cat)!;
     // Use the first non-empty icon found in this category
     if (!entry.icon && icon) entry.icon = icon;
+    if (!entry.headerColor && headerColor) entry.headerColor = headerColor;
     entry.bullets.push(...bullets);
   }
 
@@ -102,8 +129,8 @@ export default function SkillSection({ data }: Props) {
           <EmptyState icon="⚡" message="No skills listed yet." />
         ) : (
           <div className={styles.grid}>
-            {categories.map(([category, { icon, bullets }], idx) => {
-              const accent = getAccent(category);
+            {categories.map(([category, { icon, bullets, headerColor }], idx) => {
+              const accent = getAccent(category, headerColor);
               const displayIcon = icon || '✦';
 
               return (

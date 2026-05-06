@@ -36,7 +36,6 @@ export default function Hero({ profile }: HeroProps) {
   const bio =
     profile?.hero_intro ||
     'Welcome to my digital portfolio. Explore the projects, skills, and experiences that shape how I build thoughtful web systems and keep learning as a Computer Engineering student.';
-  const email = profile?.email || 'Khunapoj.s@gmail.com';
   const github = profile?.github_url || 'https://github.com/NickKhunapoj';
   const linkedin =
     profile?.linkedin_url || 'https://www.linkedin.com/in/khunapoj-suttenon-76406b1a0/';
@@ -108,9 +107,6 @@ export default function Hero({ profile }: HeroProps) {
             className={`${styles.exploreBtn} ${styles.exploreBtnPrimary}`}
           >
             Explore More
-          </a>
-          <a href={`mailto:${email}`} className={`${styles.exploreBtn} ${styles.exploreBtnSecondary}`}>
-            Get in Touch
           </a>
         </motion.div>
         <motion.div

@@ -87,6 +87,7 @@ export interface Skill {
   category: string | null;
   level: string | null;
   icon: string | null;
+  header_color: string | null;
   sort_order: number;
   is_active: boolean;
   created_at: string;
@@ -143,7 +144,7 @@ export interface CategoryConfig {
 export interface FieldConfig {
   name: string;
   label: string;
-  type: 'text' | 'textarea' | 'date' | 'number' | 'url' | 'toggle' | 'json-array' | 'image' | 'file' | 'gallery';
+  type: 'text' | 'textarea' | 'date' | 'number' | 'url' | 'toggle' | 'json-array' | 'image' | 'file' | 'gallery' | 'color';
   required?: boolean;
   placeholder?: string;
   accept?: string;
