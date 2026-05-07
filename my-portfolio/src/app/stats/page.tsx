@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 type GitHubUser = {
   login: string;
@@ -127,7 +128,15 @@ async function fetchGitHubJson<T>(path: string): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(`GitHub request failed: ${response.status}`);
+    const rateLimitRemaining = response.headers.get('x-ratelimit-remaining');
+    const rateLimitReset = response.headers.get('x-ratelimit-reset');
+    const resetTime = rateLimitReset
+      ? new Date(Number(rateLimitReset) * 1000).toISOString()
+      : 'unknown';
+
+    throw new Error(
+      `GitHub request failed: ${response.status} ${response.statusText}. Remaining=${rateLimitRemaining ?? 'unknown'}, reset=${resetTime}`,
+    );
   }
 
   return response.json() as Promise<T>;

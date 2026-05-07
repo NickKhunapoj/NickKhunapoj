@@ -129,6 +129,15 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ANALYTICS_CRON_SECRET=optional-long-random-secret
 ```
 
+For the `/stats` page, also set:
+
+```bash
+NEXT_PUBLIC_GITHUB_USERNAME=NickKhunapoj
+GITHUB_TOKEN=optional-server-only-github-token
+```
+
+`GITHUB_TOKEN` is optional, but recommended on Vercel because production serverless traffic can hit GitHub's unauthenticated API rate limit. Keep it server-only; do not prefix it with `NEXT_PUBLIC_`.
+
 Run `database/migrations/006_create_analytics_tables.sql` in Supabase before deploying analytics. The public tracker posts to `/api/analytics/track`, and the server route uses Vercel request headers such as `x-forwarded-for`, `x-vercel-ip-country`, `x-vercel-ip-country-region`, `x-vercel-ip-city`, `user-agent`, and `referer` when available. If Vercel location headers are missing, location fields gracefully show as unknown.
 
 To confirm production tracking:
