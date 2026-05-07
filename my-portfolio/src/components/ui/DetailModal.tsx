@@ -28,7 +28,8 @@ export default function DetailModal({ data, open, onClose }: Props) {
 
   // Reset active image when new item opened
   useEffect(() => {
-    if (open) setActiveImg(0);
+    if (!open) return;
+    queueMicrotask(() => setActiveImg(0));
   }, [open, data]);
 
   // Lock body scroll

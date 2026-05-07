@@ -26,7 +26,8 @@ export default function ImageLightbox({
 
   // Reset index when opening with a new initialIndex
   useEffect(() => {
-    if (open) setCurrentIndex(initialIndex);
+    if (!open) return;
+    queueMicrotask(() => setCurrentIndex(initialIndex));
   }, [open, initialIndex]);
 
   // Lock body scroll while open

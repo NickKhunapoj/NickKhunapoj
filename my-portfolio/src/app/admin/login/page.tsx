@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import styles from './login.module.css';
@@ -83,9 +84,9 @@ export default function AdminLogin() {
 
         {error && <div className={styles.error}>{error}</div>}
 
-        <a href="/" className={styles.backLink}>
+        <Link href="/" className={styles.backLink}>
           ← Back to portfolio
-        </a>
+        </Link>
       </div>
     </div>
   );

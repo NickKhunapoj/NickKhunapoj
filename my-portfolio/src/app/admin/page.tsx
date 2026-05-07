@@ -226,8 +226,13 @@ export default function AdminDashboard() {
       {/* Sidebar */}
       <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.sidebarHeader}>
-          <div className={styles.sidebarTitle}>Portfolio Admin</div>
-          <div className={styles.sidebarSubtitle}>Manage content</div>
+          <div className={styles.sidebarBrand}>
+            <div className={styles.sidebarMark}>N</div>
+            <div className={styles.sidebarCopy}>
+              <div className={styles.sidebarTitle}>Portfolio Admin</div>
+              <div className={styles.sidebarSubtitle}>Manage content</div>
+            </div>
+          </div>
         </div>
         <nav className={styles.sidebarNav}>
           {sidebarGroups.map((group) => (
@@ -237,26 +242,41 @@ export default function AdminDashboard() {
                 <button
                   key={cat.key}
                   className={`${styles.navItem} ${activeCategory === cat.key ? styles.navItemActive : ''}`}
+                  title={cat.label}
+                  aria-label={cat.label}
                   onClick={() => {
                     setActiveCategory(cat.key);
                     setSidebarOpen(false);
                   }}
                 >
                   <span className={styles.navIcon}>{cat.icon}</span>
-                  {cat.label}
+                  <span className={styles.navLabel}>{cat.label}</span>
                 </button>
               ))}
             </div>
           ))}
+          <div className={styles.sidebarGroup}>
+            <div className={styles.groupLabel}>Insights</div>
+            <Link
+              href="/admin/analytics"
+              className={styles.navItem}
+              title="Analytics"
+              aria-label="Analytics"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <span className={styles.navIcon}>↗</span>
+              <span className={styles.navLabel}>Analytics</span>
+            </Link>
+          </div>
         </nav>
         <div className={styles.sidebarFooter}>
-          <Link href="/" className={styles.navItem} style={{ marginBottom: 8 }}>
+          <Link href="/" className={styles.navItem} style={{ marginBottom: 8 }} title="View Site" aria-label="View Site">
             <span className={styles.navIcon}>🌐</span>
-            View Site
+            <span className={styles.navLabel}>View Site</span>
           </Link>
-          <button className={styles.logoutBtn} onClick={handleLogout}>
+          <button className={styles.logoutBtn} onClick={handleLogout} title="Sign Out" aria-label="Sign Out">
             <span className={styles.navIcon}>🚪</span>
-            Sign Out
+            <span className={styles.navLabel}>Sign Out</span>
           </button>
         </div>
       </aside>
