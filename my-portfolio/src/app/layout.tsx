@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Manrope, Kanit } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 import { MotionProvider } from '@/components/ui/MotionProvider';
 import AnalyticsTracker from '@/components/analytics/AnalyticsTracker';
 import './globals.css';
@@ -48,6 +49,7 @@ export default function RootLayout({
           {children}
           <AnalyticsTracker />
         </MotionProvider>
+        <Analytics />
       </body>
     </html>
   );
