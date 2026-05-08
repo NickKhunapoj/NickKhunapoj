@@ -46,7 +46,7 @@
   border-radius: inherit;
   background: radial-gradient(
     400px circle at 50% 0%,
-    rgba(41, 151, 255, 0.06),
+    var(--skill-accent-bg, rgba(41, 151, 255, 0.06)),
     transparent 50%
   );
   opacity: 0;
@@ -55,10 +55,12 @@
 }
 
 .card:hover {
-  border-color: var(--color-border-hover);
+  border-color: var(--skill-accent-border, var(--color-border-hover));
   background: rgba(255, 255, 255, 0.04);
   transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    0 0 0 1px var(--skill-accent-border, transparent);
 }
 
 .card:hover::before {
@@ -110,7 +112,8 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: var(--color-text-muted);
+  color: var(--skill-accent, var(--color-text-muted));
+  opacity: 0.82;
 }
 
 /* ── Responsive ── */

@@ -56,6 +56,18 @@ export default function TestScoreSection({ data }: Props) {
                   {item.description && (
                     <p style={{ marginTop: 8 }}>{item.description}</p>
                   )}
+                  {item.proof_url && (
+                    <a
+                      href={item.proof_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.proofLink}
+                    >
+                      <span className={styles.proofIcon}>PDF</span>
+                      <span>View certificate</span>
+                      <span aria-hidden="true">↗</span>
+                    </a>
+                  )}
                 </Card>
               );
             })}

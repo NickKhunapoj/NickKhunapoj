@@ -204,6 +204,48 @@
   transition: width 1s ease-out;
 }
 
+.proofLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin-top: var(--space-md);
+  padding: 8px 12px;
+  border: 1px solid rgba(41, 151, 255, 0.22);
+  border-radius: var(--radius-full);
+  background: rgba(41, 151, 255, 0.08);
+  color: var(--color-accent);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.proofLink:hover {
+  background: rgba(41, 151, 255, 0.14);
+  border-color: rgba(41, 151, 255, 0.42);
+  color: #64c8ff;
+  transform: translateY(-1px);
+}
+
+.proofIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text-primary);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
 @media (max-width: 1024px) {
   .grid3 {
     grid-template-columns: repeat(2, 1fr);

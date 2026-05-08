@@ -21,6 +21,8 @@ const categoryAccents: Record<string, { color: string; bg: string; border: strin
   'tools':                    { color: '#a1a1a6', bg: 'rgba(161, 161, 166, 0.10)', border: 'rgba(161, 161, 166, 0.20)' },
 };
 const defaultAccent = { color: '#2997ff', bg: 'rgba(41, 151, 255, 0.10)', border: 'rgba(41, 151, 255, 0.20)' };
+type SkillAccent = typeof defaultAccent;
+type SkillCardStyle = React.CSSProperties & Record<`--${string}`, string>;
 
 function hexToRgb(color: string) {
   const normalized = color.trim().replace('#', '');
@@ -72,13 +74,20 @@ function parseBullets(name: unknown): string[] {
 }
 
 // ── Animated card ────────────────────────────────────────────────────
-function SkillCard({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+function SkillCard({ children, delay = 0, accent }: { children: React.ReactNode; delay?: number; accent: SkillAccent }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-40px' });
+  const accentStyle: SkillCardStyle = {
+    '--skill-accent': accent.color,
+    '--skill-accent-bg': accent.bg,
+    '--skill-accent-border': accent.border,
+  };
+
   return (
     <motion.div
       ref={ref}
       className={styles.card}
+      style={accentStyle}
       initial={{ opacity: 0, y: 28 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -134,7 +143,7 @@ export default function SkillSection({ data }: Props) {
               const displayIcon = icon || '✦';
 
               return (
-                <SkillCard key={category} delay={idx * 0.07}>
+                <SkillCard key={category} delay={idx * 0.07} accent={accent}>
                   {/* Category header */}
                   <div className={styles.cardHeader}>
                     <span className={styles.categoryIcon} style={{ color: accent.color }}>

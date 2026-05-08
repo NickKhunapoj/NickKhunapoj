@@ -17,6 +17,7 @@ export default function ProjectSection({ data }: Props) {
     const links = [];
     if (item.project_url) links.push({ label: 'Live Demo', href: item.project_url, primary: true });
     if (item.github_url) links.push({ label: 'GitHub', href: item.github_url });
+    if (item.document_url) links.push({ label: 'View PDF', href: item.document_url });
 
     return {
       id: item.id,

@@ -74,6 +74,7 @@ export interface Project {
   github_url: string | null;
   image_url: string | null;
   gallery_images: string[];
+  document_url: string | null;
   highlights: string[];
   sort_order: number;
   is_active: boolean;
@@ -102,6 +103,7 @@ export interface Award {
   description: string | null;
   url: string | null;
   gallery_images: string[];
+  document_url: string | null;
   sort_order: number;
   is_active: boolean;
   created_at: string;
@@ -116,6 +118,7 @@ export interface TestScore {
   test_date: string | null;
   issuer: string | null;
   description: string | null;
+  proof_url: string | null;
   sort_order: number;
   is_active: boolean;
   created_at: string;

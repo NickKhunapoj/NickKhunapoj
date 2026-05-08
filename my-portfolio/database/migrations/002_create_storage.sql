@@ -8,11 +8,12 @@ VALUES (
   'portfolio-assets',
   'portfolio-assets',
   true,
-  5242880, -- 5MB limit
+  10485760, -- 10MB limit
   '{image/jpeg,image/png,image/gif,image/webp,image/svg+xml,application/pdf}'
 )
 ON CONFLICT (id) DO UPDATE SET 
   public = true,
+  file_size_limit = 10485760,
   allowed_mime_types = '{image/jpeg,image/png,image/gif,image/webp,image/svg+xml,application/pdf}';
 
 -- 2. Storage Policies

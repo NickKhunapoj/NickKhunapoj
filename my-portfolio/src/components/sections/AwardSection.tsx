@@ -13,6 +13,7 @@ export default function AwardSection({ data }: Props) {
 
     const links = [];
     if (item.url) links.push({ label: 'View Award', href: item.url, primary: true });
+    if (item.document_url) links.push({ label: 'View Proof PDF', href: item.document_url });
 
     return {
       id: item.id,

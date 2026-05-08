@@ -46,6 +46,8 @@ export default function AdminDashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Record<string, unknown> | null>(null);
   const [formData, setFormData] = useState<Record<string, unknown>>({});
+  const [pendingDeleteUrls, setPendingDeleteUrls] = useState<string[]>([]);
+  const [pendingUploadedUrls, setPendingUploadedUrls] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
   const currentCategory = categories.find((c) => c.key === activeCategory)!;
@@ -82,13 +84,86 @@ export default function AdminDashboard() {
   const openCreateModal = () => {
     setEditingItem(null);
     setFormData({});
+    setPendingDeleteUrls([]);
+    setPendingUploadedUrls([]);
     setModalOpen(true);
   };
 
   const openEditModal = (item: Record<string, unknown>) => {
     setEditingItem(item);
     setFormData(item);
+    setPendingDeleteUrls([]);
+    setPendingUploadedUrls([]);
     setModalOpen(true);
+  };
+
+  const closeModal = async () => {
+    if (pendingUploadedUrls.length > 0) {
+      try {
+        const { deleteStoredFiles } = await import('@/lib/supabase/storage');
+        await deleteStoredFiles(pendingUploadedUrls);
+      } catch (deleteError) {
+        console.error(deleteError);
+        addToast('Some unsaved uploaded files could not be removed from storage', 'error');
+      }
+    }
+
+    setPendingDeleteUrls([]);
+    setPendingUploadedUrls([]);
+    setModalOpen(false);
+  };
+
+  const buildSavePayload = () => {
+    return currentCategory.fields.reduce<Record<string, unknown>>((payload, field) => {
+      if (field.name === 'sort_order' || field.name === 'is_active') {
+        payload[field.name] = formData[field.name];
+        return payload;
+      }
+
+      const value = formData[field.name];
+
+      if (value === undefined) return payload;
+
+      if ((field.type === 'date' || field.type === 'file' || field.type === 'image' || field.type === 'url' || field.type === 'color') && value === '') {
+        payload[field.name] = null;
+        return payload;
+      }
+
+      payload[field.name] = value;
+      return payload;
+    }, {});
+  };
+
+  const getSaveErrorMessage = (error: unknown) => {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+
+    if (
+      (message.includes('proof_url') || message.includes('document_url') || message.includes('schema cache'))
+    ) {
+      return `${message}. Run the latest database migration for this file field, then refresh the Supabase schema cache.`;
+    }
+
+    if (message.includes('header_color')) {
+      return `${message}. Run database/migrations/011_ensure_skill_header_color.sql in Supabase, then refresh the Supabase schema cache.`;
+    }
+
+    return message;
+  };
+
+  const collectStoredUrls = (item: Record<string, unknown>) => {
+    return currentCategory.fields.flatMap((field) => {
+      const value = item[field.name];
+
+      if ((field.type === 'file' || field.type === 'image') && typeof value === 'string') {
+        return [value];
+      }
+
+      if (field.type === 'gallery' && Array.isArray(value)) {
+        return value.filter((url): url is string => typeof url === 'string');
+      }
+
+      return [];
+    });
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -96,10 +171,12 @@ export default function AdminDashboard() {
     setSaving(true);
 
     try {
+      const savePayload = buildSavePayload();
+
       if (editingItem) {
         const { error } = await supabase
           .from(activeCategory)
-          .update(formData)
+          .update(savePayload)
           .eq('id', editingItem.id);
         if (error) throw error;
         addToast('Item updated successfully', 'success');
@@ -116,7 +193,7 @@ export default function AdminDashboard() {
           newOrder = maxOrderData[0].sort_order + 1;
         }
 
-        const dataToInsert = { ...formData };
+        const dataToInsert = { ...savePayload };
         if (activeCategory !== 'profiles') {
           dataToInsert.sort_order = newOrder;
         }
@@ -125,10 +202,23 @@ export default function AdminDashboard() {
         if (error) throw error;
         addToast('Item created successfully', 'success');
       }
+
+      if (pendingDeleteUrls.length > 0) {
+        try {
+          const { deleteStoredFiles } = await import('@/lib/supabase/storage');
+          await deleteStoredFiles(pendingDeleteUrls);
+          setPendingDeleteUrls([]);
+        } catch (deleteError) {
+          console.error(deleteError);
+          addToast('Saved, but old storage files could not be removed', 'error');
+        }
+      }
+
+      setPendingUploadedUrls([]);
       setModalOpen(false);
       fetchItems();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
+      const message = getSaveErrorMessage(err);
       addToast(`Error: ${message}`, 'error');
     } finally {
       setSaving(false);
@@ -138,10 +228,23 @@ export default function AdminDashboard() {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this item?')) return;
 
+    const itemToDelete = items.find((item) => item.id === id);
     const { error } = await supabase.from(activeCategory).delete().eq('id', id);
     if (error) {
       addToast(`Error: ${error.message}`, 'error');
     } else {
+      if (itemToDelete) {
+        const urls = collectStoredUrls(itemToDelete);
+        if (urls.length > 0) {
+          try {
+            const { deleteStoredFiles } = await import('@/lib/supabase/storage');
+            await deleteStoredFiles(urls);
+          } catch (deleteError) {
+            console.error(deleteError);
+            addToast('Item deleted, but old storage files could not be removed', 'error');
+          }
+        }
+      }
       addToast('Item deleted', 'success');
       fetchItems();
     }
@@ -369,7 +472,7 @@ export default function AdminDashboard() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setModalOpen(false)}
+            onClick={closeModal}
           >
             <motion.div
               className={styles.modal}
@@ -387,6 +490,12 @@ export default function AdminDashboard() {
                   key={field.name}
                   field={field}
                   value={formData[field.name]}
+                  markForDeletion={(url) =>
+                    setPendingDeleteUrls((prev) => Array.from(new Set([...prev, url])))
+                  }
+                  markUploaded={(url) =>
+                    setPendingUploadedUrls((prev) => Array.from(new Set([...prev, url])))
+                  }
                   onChange={(val) =>
                     setFormData((prev) => ({ ...prev, [field.name]: val }))
                   }
@@ -394,7 +503,7 @@ export default function AdminDashboard() {
               ))}
 
               <div className={styles.modalActions}>
-                <Button type="button" variant="ghost" onClick={() => setModalOpen(false)}>
+                <Button type="button" variant="ghost" onClick={closeModal}>
                   Cancel
                 </Button>
                 <Button type="button" variant="primary" onClick={handleSave} disabled={saving}>
@@ -496,10 +605,14 @@ function FormField({
   field,
   value,
   onChange,
+  markForDeletion,
+  markUploaded,
 }: {
   field: FieldConfig;
   value: unknown;
   onChange: (val: unknown) => void;
+  markForDeletion: (url: string) => void;
+  markUploaded: (url: string) => void;
 }) {
   const [uploading, setUploading] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
@@ -519,15 +632,36 @@ function FormField({
     }
 
     setUploading(true);
-    const { uploadFile } = await import('@/lib/supabase/storage');
-    const url = await uploadFile(file);
-    if (url) {
-      onChange(url);
-    } else {
-      alert('Failed to upload file.');
+    try {
+      const { uploadFile } = await import('@/lib/supabase/storage');
+      const url = await uploadFile(file);
+      if (url) {
+        const previousUrl = typeof value === 'string' ? value : '';
+        markUploaded(url);
+        onChange(url);
+        if (previousUrl && previousUrl !== url) {
+          markForDeletion(previousUrl);
+        }
+      } else {
+        alert('Failed to upload file.');
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to upload file.';
+      alert(`Failed to upload file: ${message}`);
+    } finally {
+      setUploading(false);
+      e.target.value = '';
     }
-    setUploading(false);
-    e.target.value = '';
+  };
+
+  const removeStoredFile = async (url: string, clearValue: () => void) => {
+    markForDeletion(url);
+    clearValue();
+  };
+
+  const removeGalleryImage = async (url: string, nextImages: string[]) => {
+    markForDeletion(url);
+    onChange(nextImages);
   };
 
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -539,17 +673,26 @@ function FormField({
     }
 
     setUploadingGallery(true);
-    const { uploadFile } = await import('@/lib/supabase/storage');
-    const current = Array.isArray(value) ? (value as string[]) : [];
-    const uploaded: string[] = [];
+    try {
+      const { uploadFile } = await import('@/lib/supabase/storage');
+      const current = Array.isArray(value) ? (value as string[]) : [];
+      const uploaded: string[] = [];
 
-    for (const file of files) {
-      const url = await uploadFile(file);
-      if (url) uploaded.push(url);
+      for (const file of files) {
+        const url = await uploadFile(file);
+        if (url) {
+          uploaded.push(url);
+          markUploaded(url);
+        }
+      }
+      onChange([...current, ...uploaded]);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to upload images.';
+      alert(`Failed to upload images: ${message}`);
+    } finally {
+      setUploadingGallery(false);
+      e.target.value = '';
     }
-    onChange([...current, ...uploaded]);
-    setUploadingGallery(false);
-    e.target.value = '';
   };
 
   if (field.type === 'toggle') {
@@ -610,7 +753,7 @@ function FormField({
             />
           </div>
           {imageUrl && (
-            <button type="button" onClick={() => onChange('')} style={{ color: 'var(--color-danger)', fontSize: 'var(--text-xs)', flexShrink: 0 }}>
+            <button type="button" onClick={() => removeStoredFile(imageUrl, () => onChange(''))} style={{ color: 'var(--color-danger)', fontSize: 'var(--text-xs)', flexShrink: 0 }}>
               ✕ Remove
             </button>
           )}
@@ -628,6 +771,10 @@ function FormField({
     const fileUrl = typeof value === 'string' ? value : '';
     const isPdf = field.accept === 'application/pdf';
     const isResume = field.name === 'resume_url';
+    const isProof = field.name === 'proof_url';
+    const isDocument = field.name === 'document_url';
+    const fileNoun = isResume ? 'resume' : isProof ? 'test proof' : isDocument ? 'PDF document' : 'file';
+    const titleFileNoun = `${fileNoun[0].toUpperCase()}${fileNoun.slice(1)}`;
     return (
       <div className={styles.formField}>
         <label className={styles.formLabel}>{field.label}</label>
@@ -636,10 +783,12 @@ function FormField({
             <span className={styles.fileUploadIcon}>{isPdf ? '📄' : '📎'}</span>
             <div className={styles.fileUploadText}>
               <span className={styles.fileUploadTitle}>
-                {fileUrl ? 'Resume is ready' : isResume ? 'Upload your resume' : 'Upload file'}
+                {fileUrl ? `${titleFileNoun} is ready` : `Upload ${fileNoun}`}
               </span>
               <span className={styles.fileUploadHint}>
-                {isPdf ? 'PDF only, up to 10 MB. This powers the About Me resume button.' : 'Max 10 MB.'}
+                {isPdf
+                  ? `${isResume ? 'Resume' : isProof ? 'Exam proof' : 'PDF'} only, up to 10 MB.${isResume ? ' This powers the About Me resume button.' : ''}`
+                  : 'Max 10 MB.'}
               </span>
             </div>
           </div>
@@ -647,13 +796,13 @@ function FormField({
           {fileUrl && (
             <div className={styles.fileCurrent}>
               <span className={styles.fileCurrentName}>
-                {isPdf ? 'Current resume PDF' : 'Current file'}
+                {isPdf ? `Current ${fileNoun} PDF` : `Current ${fileNoun}`}
             </span>
               <div className={styles.fileActions}>
                 <a href={fileUrl} target="_blank" rel="noopener noreferrer" className={styles.fileActionLink}>
                   View ↗
                 </a>
-                <button type="button" onClick={() => onChange('')} className={styles.fileRemoveBtn}>
+                <button type="button" onClick={() => removeStoredFile(fileUrl, () => onChange(''))} className={styles.fileRemoveBtn}>
                   Remove
                 </button>
               </div>
@@ -718,7 +867,7 @@ function FormField({
                 <img src={url} alt={`Gallery ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 <button
                   type="button"
-                  onClick={() => onChange(images.filter((_, idx) => idx !== i))}
+                  onClick={() => removeGalleryImage(url, images.filter((_, idx) => idx !== i))}
                   style={{
                     position: 'absolute', top: 2, right: 2, width: 20, height: 20,
                     borderRadius: '50%', background: 'rgba(0,0,0,0.7)', color: '#fff',
