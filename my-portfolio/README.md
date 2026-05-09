@@ -156,6 +156,14 @@ Troubleshooting:
 - If Supabase returns `PGRST205`, run the analytics migration and refresh the Supabase schema cache.
 - Browser ad blockers can block URLs containing `analytics`; this tracker fails silently so the public site keeps working.
 
+## Vercel Speed Insights
+
+Vercel Speed Insights is enabled with `@vercel/speed-insights`. The `SpeedInsights` component is added in `src/app/layout.tsx` near the end of the root `<body>`, alongside Vercel Web Analytics.
+
+Deploy to Vercel and visit the production deployment to collect real-user performance data in the Vercel dashboard. No extra environment variables are required for the basic Speed Insights setup.
+
+Speed Insights measures performance metrics. The custom Supabase analytics system remains separate and continues tracking visitor and page-view information for the admin dashboard.
+
 ## Supabase Pause Prevention
 
 This project includes a small first-party keep-alive endpoint inspired by [travisvn/supabase-pause-prevention](https://github.com/travisvn/supabase-pause-prevention). Vercel Cron calls a protected Next.js route every 3 days, and that route performs one lightweight Supabase database update so the project has safe periodic activity.
