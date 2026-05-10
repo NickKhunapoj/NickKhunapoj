@@ -97,7 +97,7 @@ export default function AdminDashboard() {
     setModalOpen(true);
   };
 
-  const closeModal = async () => {
+  const closeModal = useCallback(async () => {
     if (pendingUploadedUrls.length > 0) {
       try {
         const { deleteStoredFiles } = await import('@/lib/supabase/storage');
@@ -111,7 +111,34 @@ export default function AdminDashboard() {
     setPendingDeleteUrls([]);
     setPendingUploadedUrls([]);
     setModalOpen(false);
-  };
+  }, [addToast, pendingUploadedUrls]);
+
+  useEffect(() => {
+    const shouldLockScroll = sidebarOpen || modalOpen;
+    const previousOverflow = document.body.style.overflow;
+
+    if (shouldLockScroll) {
+      document.body.style.overflow = 'hidden';
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      if (modalOpen) {
+        void closeModal();
+        return;
+      }
+      if (sidebarOpen) {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [closeModal, modalOpen, sidebarOpen]);
 
   const buildSavePayload = () => {
     return currentCategory.fields.reduce<Record<string, unknown>>((payload, field) => {
@@ -336,6 +363,14 @@ export default function AdminDashboard() {
               <div className={styles.sidebarSubtitle}>Manage content</div>
             </div>
           </div>
+          <button
+            type="button"
+            className={styles.sidebarCloseBtn}
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close admin menu"
+          >
+            ×
+          </button>
         </div>
         <nav className={styles.sidebarNav}>
           {sidebarGroups.map((group) => (

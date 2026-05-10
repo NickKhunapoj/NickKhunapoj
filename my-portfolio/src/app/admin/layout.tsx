@@ -1,7 +1,7 @@
 import { ToastProvider } from '@/components/ui/Toast';
 
 export const metadata = {
-  title: 'Admin — Portfolio',
+  title: 'Admin - Portfolio',
 };
 
 export default function AdminLayout({
@@ -9,6 +9,6 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Auth protection is handled by middleware.ts
+  // Auth protection is handled by src/proxy.ts.
   return <ToastProvider>{children}</ToastProvider>;
 }

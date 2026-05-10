@@ -209,6 +209,27 @@ export default function AdminAnalyticsPage() {
     });
   }, [fetchAnalytics]);
 
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+
+    if (sidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [sidebarOpen]);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/admin/login');
@@ -269,6 +290,14 @@ export default function AdminAnalyticsPage() {
               <div className={adminStyles.sidebarSubtitle}>Insights</div>
             </div>
           </div>
+          <button
+            type="button"
+            className={adminStyles.sidebarCloseBtn}
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close admin menu"
+          >
+            ×
+          </button>
         </div>
         <nav className={adminStyles.sidebarNav}>
           <div className={adminStyles.sidebarGroup}>

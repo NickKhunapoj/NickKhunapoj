@@ -3,16 +3,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-lg);
+  padding: max(var(--space-lg), env(safe-area-inset-top)) var(--space-lg);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(41, 151, 255, 0.09), transparent 36%),
+    var(--color-bg);
 }
 
 .loginCard {
   width: 100%;
   max-width: 400px;
   padding: var(--space-2xl);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent),
+    var(--color-bg-secondary);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
+  box-shadow: var(--glass-shadow-lg);
 }
 
 .title {
@@ -41,6 +47,7 @@
 
 .input {
   width: 100%;
+  min-height: 44px;
   padding: 12px 16px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -53,10 +60,12 @@
 
 .input:focus {
   border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-soft);
 }
 
 .submitBtn {
   width: 100%;
+  min-height: 46px;
   padding: 12px;
   margin-top: var(--space-md);
   background: var(--color-accent);
@@ -99,4 +108,20 @@
 
 .backLink:hover {
   color: var(--color-accent);
+}
+
+@media (max-width: 480px) {
+  .loginPage {
+    align-items: flex-start;
+    padding: calc(var(--space-3xl) + env(safe-area-inset-top)) 14px var(--space-lg);
+  }
+
+  .loginCard {
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+  }
+
+  .title {
+    font-size: var(--text-xl);
+  }
 }
