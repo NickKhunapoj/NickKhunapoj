@@ -131,6 +131,16 @@ const certificationsCategory: CategoryConfig = {
   fields: [
     { name: 'name', label: 'Name', type: 'text', required: true, placeholder: 'e.g., AWS Solutions Architect' },
     { name: 'issuer', label: 'Issuer', type: 'text', required: true, placeholder: 'e.g., Amazon Web Services' },
+    {
+      name: 'certificate_type',
+      label: 'Certificate Type',
+      type: 'select',
+      required: true,
+      options: [
+        { label: 'Exam Certification', value: 'exam' },
+        { label: 'Certificate of Completion', value: 'completion' },
+      ],
+    },
     { name: 'issue_date', label: 'Issue Date', type: 'date' },
     { name: 'expiration_date', label: 'Expiration Date', type: 'date' },
     { name: 'credential_id', label: 'Credential ID', type: 'text' },

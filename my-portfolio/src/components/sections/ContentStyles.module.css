@@ -169,6 +169,44 @@
   margin-left: 4px;
 }
 
+/* Certification grouping */
+.certGroupList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.certGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.certGroupHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.certGroupHeader h3 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.certGroupHeader p {
+  margin: 0;
+  color: var(--color-text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  text-align: right;
+}
+
 /* Score display */
 .scoreDisplay {
   display: flex;
@@ -256,6 +294,24 @@
   .grid2,
   .grid3 {
     grid-template-columns: 1fr;
+  }
+
+  .certGroupList {
+    gap: var(--space-xl);
+  }
+
+  .certGroupHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .certGroupHeader h3 {
+    font-size: var(--text-lg);
+  }
+
+  .certGroupHeader p {
+    text-align: left;
   }
 }
 

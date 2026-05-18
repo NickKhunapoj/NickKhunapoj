@@ -53,6 +53,7 @@ export interface Certification {
   id: string;
   name: string;
   issuer: string;
+  certificate_type: 'exam' | 'completion' | null;
   issue_date: string | null;
   expiration_date: string | null;
   credential_id: string | null;
@@ -147,10 +148,11 @@ export interface CategoryConfig {
 export interface FieldConfig {
   name: string;
   label: string;
-  type: 'text' | 'textarea' | 'date' | 'number' | 'url' | 'toggle' | 'json-array' | 'image' | 'file' | 'gallery' | 'color';
+  type: 'text' | 'textarea' | 'date' | 'number' | 'url' | 'toggle' | 'json-array' | 'image' | 'file' | 'gallery' | 'color' | 'select';
   required?: boolean;
   placeholder?: string;
   accept?: string;
+  options?: Array<{ label: string; value: string }>;
 }
 
 // Sidebar group for admin navigation

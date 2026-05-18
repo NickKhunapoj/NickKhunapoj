@@ -151,7 +151,7 @@ export default function AdminDashboard() {
 
       if (value === undefined) return payload;
 
-      if ((field.type === 'date' || field.type === 'file' || field.type === 'image' || field.type === 'url' || field.type === 'color') && value === '') {
+      if ((field.type === 'date' || field.type === 'file' || field.type === 'image' || field.type === 'url' || field.type === 'color' || field.type === 'select') && value === '') {
         payload[field.name] = null;
         return payload;
       }
@@ -172,6 +172,10 @@ export default function AdminDashboard() {
 
     if (message.includes('header_color')) {
       return `${message}. Run database/migrations/011_ensure_skill_header_color.sql in Supabase, then refresh the Supabase schema cache.`;
+    }
+
+    if (message.includes('certificate_type')) {
+      return `${message}. Run database/migrations/012_add_certificate_type.sql in Supabase, then refresh the Supabase schema cache.`;
     }
 
     return message;
@@ -886,6 +890,27 @@ function FormField({
             placeholder={field.placeholder || '#2997ff'}
           />
         </div>
+      </div>
+    );
+  }
+
+  if (field.type === 'select') {
+    return (
+      <div className={styles.formField}>
+        <label className={styles.formLabel}>{field.label}</label>
+        <select
+          className={styles.formInput}
+          value={String(value ?? '')}
+          onChange={(e) => onChange(e.target.value)}
+          required={field.required}
+        >
+          <option value="">Select {field.label.toLowerCase()}</option>
+          {(field.options ?? []).map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       </div>
     );
   }

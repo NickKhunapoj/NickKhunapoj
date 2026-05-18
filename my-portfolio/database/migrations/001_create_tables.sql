@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS certifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   issuer TEXT NOT NULL,
+  certificate_type TEXT NOT NULL DEFAULT 'completion' CHECK (certificate_type IN ('exam', 'completion')),
   issue_date DATE,
   expiration_date DATE,
   credential_id TEXT,
